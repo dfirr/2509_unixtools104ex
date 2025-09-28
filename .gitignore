@@ -4,3 +4,6 @@
 .Ruserdata
 
 /.quarto/
+
+# Quarto build output
+_book/

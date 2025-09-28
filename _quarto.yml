@@ -1,0 +1,25 @@
+project:
+  type: book
+
+book:
+  title: Unix Tools 104 -- Excercise
+  author: Shintaro Watanabe
+  date: 2025-10-10
+  chapters:
+    - index.qmd
+    - 01-curl_jq.qmd
+
+# bibliography: references.bib
+
+lang: ja
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+engine: knitr
+
+execute:
+  freeze: auto

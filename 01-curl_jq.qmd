@@ -1,0 +1,1123 @@
+# Web APIの処理（curl, jq）
+## 目的
+この章の目的は、次の通りです。
+
+- HTTPのリクエストとレスポンスとを理解すること。
+- curlのオプションを身に着けること。
+- jqを使ってJSONファイルが加工できるようになること。
+
+実際のWebサイトやWeb APIにアクセスして学習していきます。
+
+## 必要な準備
+PCでWSL（Windows Subsystem for Linux）が使えるようになっている
+必要があります。
+
+## curl
+### 単純な閲覧 {.unnumbered}
+阿部寛のホームページに、curlを使ってアクセスします。
+``` bash {code-line-numbers="false"}
+curl -s 'http://abehiroshi.la.coocan.jp/'
+```
+curlのコマンドラインオプションは、以下の通りです。
+
+  - `-s`: メッセージを抑制する。
+
+``` html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<meta name="GENERATOR" content="JustSystems Homepage Builder Version 20.0.6.0 for Windows">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title>�������̃z�[���y�[�W</title>
+</head>
+<frameset cols=18,82>
+  <frame src="menu.htm" marginheight="0" marginwidth="0" scrolling="auto" name="left">
+  <frame src="top.htm" marginheight="0" marginwidth="0" scrolling="auto" name="right">
+  <noframes>
+  <body></body>
+  </noframes>
+</frameset>
+</html>
+```
+
+HTML形式で表示されていますが、`<title>`タグの内容が文字化けしています。
+これは、このホームページが今どき珍しくShift_JIS文字コードでエンコーディング
+されているのに対し、WSLのコンソールはUTF-8文字コードを前提としているためです。
+
+パイプ（`|`）を使って、Shift_JISをUTF-8に変換して出力します。
+
+``` bash {code-line-numbers="false"}
+curl -s 'http://abehiroshi.la.coocan.jp/' | iconv -f sjis -t utf8
+```
+iconvのコマンドラインオプションは、以下の通りです。
+
+  - `-f`: 変換元の文字コード（from）
+  - `-t`: 変換先の文字コード（to）
+
+``` html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<meta name="GENERATOR" content="JustSystems Homepage Builder Version 20.0.6.0 for Windows">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title>阿部寛のホームページ</title>
+</head>
+<frameset cols=18,82>
+  <frame src="menu.htm" marginheight="0" marginwidth="0" scrolling="auto" name="left">
+  <frame src="top.htm" marginheight="0" marginwidth="0" scrolling="auto" name="right">
+  <noframes>
+  <body></body>
+  </noframes>
+</frameset>
+</html>
+```
+
+### 詳細表示 {.unnumbered}
+`-v`オプションを追加することで、HTTPリクエストやレスポンスの内容、
+その他の付加情報が得られます。
+
+``` bash {code-line-numbers="false"}
+curl -sv 'http://abehiroshi.la.coocan.jp/'
+```
+
+::: {.callout-note}
+オプションを`-sv`のように一括して与えることも、
+`-s -v`のように分割して与えることもできます。
+:::
+
+``` bash
+* Host abehiroshi.la.coocan.jp:80 was resolved.
+* IPv6: 2001:258:8613:5000::101
+* IPv4: 222.158.205.72
+*   Trying 222.158.205.72:80...
+* Connected to abehiroshi.la.coocan.jp (222.158.205.72) port 80
+> GET / HTTP/1.1
+> Host: abehiroshi.la.coocan.jp
+> User-Agent: curl/8.5.0
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Date: Sat, 27 Sep 2025 09:02:50 GMT
+< Content-Type: text/html
+< Content-Length: 538
+< Connection: keep-alive
+< Last-Modified: Wed, 09 Jul 2025 05:12:05 GMT
+< ETag: "21a-639781e351da7"
+< Accept-Ranges: bytes
+< Server: Apache
+<
+<html>
+（以下略）
+```
+
+`>`ではじまる行がリクエスト（クライアント to サーバー）を、
+`<`ではじまる行がレスポンス（サーバー to クライアント）を、
+`*`ではじまる行が付加情報を意味します。
+
+リクエストとレスポンスとの内容に注目し、以下の問いに答えてください。
+
+**問題: HTTPのバージョンは何でしょうか？**
+
+::: {.callout-tip title="解答" collapse="true"}
+1.1です。
+:::
+
+**問題: このHTTPリクエストは正常に応答されましたか？**
+
+::: {.callout-tip title="解答" collapse="true"}
+レスポンスが`200 OK`なので、正常に応答されています。
+:::
+
+**問題: このHTML文書が最後に更新された日付は何ですか？**
+
+::: {.callout-tip title="解答" collapse="true"}
+`Wed, 09 Jul 2025 05:12:05 GMT`なので、2025年7月9日です。
+:::
+
+### ステータスコード {.unnumbered}
+200以外のステータスコードを得てみます。
+「阿部寛のホームページ」には存在しないページに対して
+リクエストを出すと、404（Not Found）のエラーが返るはずです。
+
+``` bash {code-line-numbers="false"}
+curl -sv 'http://abehiroshi.la.coocan.jp/test.html'
+```
+``` bash
+* Host abehiroshi.la.coocan.jp:80 was resolved.
+* IPv6: 2001:258:8613:5000::101
+* IPv4: 222.158.205.72
+*   Trying 222.158.205.72:80...
+* Connected to abehiroshi.la.coocan.jp (222.158.205.72) port 80
+> GET /test.html HTTP/1.1
+> Host: abehiroshi.la.coocan.jp
+> User-Agent: curl/8.5.0
+> Accept: */*
+>
+< HTTP/1.1 404 Not Found
+< Date: Sat, 27 Sep 2025 12:54:15 GMT
+< Content-Type: text/html
+< Content-Length: 3094
+< Connection: keep-alive
+<
+（以下略）
+```
+
+::: {.callout-note}
+`-f`オプションを付ると、400番台・500番台のステータスコードが
+サーバーから帰ってきた場合に、curlがエラー終了します。
+
+エラー終了した場合には、bashの`$?`が0以外の値になります。
+
+``` bash {code-line-numbers="false"}
+curl -sf 'http://abehiroshi.la.coocan.jp/test.html'
+echo $?
+```
+``` bash {code-line-numbers="false"}
+22
+```
+:::
+
+ステータスコードは3桁の数字で、大分類は次の通りです。
+
+| カテゴリ | 説明 |
+|----------|--------------------------------------|
+| 1xx: Informational | リクエストを受け取り、処理を続行中 |
+| 2xx: Success | リクエストが成功し、処理が完了した |
+| 3xx: Redirection | リクエストを完了するために別の場所へ移動が必要 |
+| 4xx: Client Error | クライアント（利用者）のリクエストに問題がある |
+| 5xx: Server Error | サーバー側の問題でリクエストを処理できない |
+
+1つ1つのコードの意味は、[Mozillaのページ](https://developer.mozilla.org/ja/docs/Web/HTTP/Reference/Status)で
+確認できます。Mozillaのページを参照し、以下の問いに答えてください。
+
+**問題: 「Bad Gateway」のステータスコードは何番ですか？**
+
+::: {.callout-tip title="解答" collapse="true"}
+502です。
+:::
+
+**問題: Webサイトを移転し、旧サイトに届いたリクエストは新サイトに転送したいと思います。
+旧サイトにアクセスしたときには、どのステータスコードを返却すればよいですか？**
+
+::: {.callout-tip title="解答" collapse="true"}
+今回の移転が永続的であれば、`301 Moved Permanently`が適切です。一方で、
+メンテナンス中など一時的な移転であれば`307 Temporary Redirect`を返すのが適切です。
+:::
+
+**問題: あるWeb APIでは、1秒間に10リクエストまでしか処理できない仕様です。
+このWeb APIに対して1秒間に100リクエストを投げたとき、失敗する90リクエスト分に
+付与されるステータスコードは何になるでしょうか？**
+
+::: {.callout-tip title="解答" collapse="true"}
+このようなWeb API上の制限は、一般にRate Limitと呼ばれます。
+Rate Limitを示すステータスコードは、`429 Too Many Requests`です。
+:::
+
+**問題: ユーザーがサイトにログインを試みましたが、パスワードを間違えて認証に失敗しました。
+返すべきステータスコードは何でしょうか。**
+
+::: {.callout-tip title="解答" collapse="true"}
+認証に失敗した場合には、`401 Unauthorized`を返します。
+`403 Forbidden`は、認証には成功している（もしくは認証機構がない）けれども
+アクセス権がない場合に返すステータスコートです。
+
+ただし、実際のWebアプリでは、認証に失敗したときに`200 OK`が
+返ってくることも多々あります。
+:::
+
+### 出力制御 {.unnumbered}
+統計分析の入門用データセットに使用される[Palmer Penguins](https://github.com/allisonhorst/palmerpenguins)の
+CSVファイルにアクセスします。
+
+``` bash {code-line-numbers="false"}
+curl -s 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
+```
+``` bash
+ength_mm,body_mass_g,sex,year
+Adelie,Torgersen,39.1,18.7,181,3750,male,2007
+Adelie,Torgersen,39.5,17.4,186,3800,female,2007
+Adelie,Torgersen,40.3,18,195,3250,female,2007
+Adelie,Torgersen,NA,NA,NA,NA,NA,2007
+（以下略） 
+```
+
+`-o`オプションで、レスポンス内容をファイル出力できます。このときファイル名の指定が
+必要ですが、`-O`オプションををつけるとサーバー上のファイル名で保存されます。
+
+``` bash {code-line-numbers="false"}
+curl -s -O 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
+```
+``` bash {code-line-numbers="false"}
+head penguins.csv -n 10
+```
+
+- `head`は、`-n`オプションで指定した行数だけ先頭から表示するコマンドです。
+
+``` bash
+species,island,bill_length_mm,bill_depth_mm,flipper_length_mm,body_mass_g,sex,year
+Adelie,Torgersen,39.1,18.7,181,3750,male,2007
+Adelie,Torgersen,39.5,17.4,186,3800,female,2007
+Adelie,Torgersen,40.3,18,195,3250,female,2007
+Adelie,Torgersen,NA,NA,NA,NA,NA,2007
+Adelie,Torgersen,36.7,19.3,193,3450,female,2007
+Adelie,Torgersen,39.3,20.6,190,3650,male,2007
+Adelie,Torgersen,38.9,17.8,181,3625,female,2007
+Adelie,Torgersen,39.2,19.6,195,4675,male,2007
+Adelie,Torgersen,34.1,18.1,193,3475,NA,2007
+```
+
+**問題: 先のCSVファイルを、「palmer.csv」という名前でダウンロード保存してください。**
+
+::: {.callout-tip title="解答" collapse="true"}
+`-o`オプションを使います。
+``` bash {code-line-numbers="false"}
+curl -s -o palmer.csv 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
+```
+:::
+
+ダウンロード時に圧縮転送をしたければ、`--compressed`オプションをつけます。
+
+::: {.callout-note}
+圧縮転送の効果を確認したければ、実際のダウンロード量を測定すればよいでしょう。
+`-w`オプションと`%{size_download}`という変数の組み合わせで実現できます。
+
+``` bash {code-line-numbers="false"}
+curl -s -o /dev/null -w '%{size_download}\n' 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
+```
+
+- `/dev/null`は、Unixでのゴミ捨て場です。ファイルを何も保存しないことになります。
+
+``` bash {code-line-numbers="false"}
+15241
+```
+
+``` bash {code-line-numbers="false"}
+curl -s -o /dev/null -w '%{size_download}\n' --compressed 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
+```
+``` bash
+2976
+```
+
+シンプルなテキストファイルなので、約1/5に圧縮されています。
+:::
+
+### メソッド {.unnumbered}
+クライアントからサーバーにアクセスするとき、検索文字列やユーザー名など、
+パラメーターを送りたいときがあります。
+
+パラメーターを送る手法として、`GET`メソッドを使うケースと、`POST`メソッドを
+使うケースとがあります。違いを以下に整理します。
+
+| 項目 | GET | POST |
+|------|-----|------|
+| 主な用途 | 情報を取得（読み取り） | 情報を送信・作成・更新 |
+| パラメーターの埋め込み先 | URLのクエリ文字列（例：`?key=value`） | リクエスト本文（Body） |
+| サイズ制限 | URL の長さに依存（ブラウザーで制限あり） | 通常は大きなデータを送信できる |
+| セキュリティ上の注意 | URLに露出するので機密情報を入れない | 暗号化しない限りは盗聴されうる |
+
+[httpbin.org](https://httpbin.org/)は、HTTPクライアントのテスト用に作られたサービスです。
+その中に、こちらで送信したパラメーターをJSON形式で返却してくれる機能があります。
+GETを待ち受けるURLは`https://httpbin.org/get`、POSTを待ち受けるURLは`https://httpbin.org/post`です。
+
+以下のパラメーターの組を、`GET`と`POST`とで送ってみましょう。
+
+| name  | age |
+|-------|-----|
+| alice | 20  |
+
+GETメソッドでパラメーターを送信する際には、`--url-query`オプションを使用します。
+`https://httpbin.org/get`に対して、上のパラメーターの組を送信する例を示します。
+
+``` bash
+curl -s 'https://httpbin.org/get' --url-query 'name=alice' --url-query 'age=20' 
+```
+``` json
+{
+  "args": {
+    "age": "20",
+    "name": "alice"
+  },
+（以下略）
+```
+
+`args`オブジェクトの中に、`name`と`age`とが適切に格納されています。
+このように、`--url-query`オプションを重ねて使うことで、複数のパラメーターが
+送信できます。
+
+POSTメソッドでパラメーターを送信する際には、いくつかの流儀があります。
+
+古典的にはフォームエンコーディングが使用されます。これは埋め込むデータ自体は
+`--url-query`と同じなのですが、埋め込む先がURLではなくリクエストボディ（本文）に
+なっています。
+
+curlでは、`-d`オプションを使ってパラメーターを送信すれば、
+デフォルトでフォームエンコーディングになります。
+
+``` bash
+curl -s 'https://httpbin.org/post' -d 'name=alice' -d 'age=20'
+```
+
+- オプションの並び順は順不同です。`-d`オプションを最初にしてもかまいません。
+
+``` json
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {
+    "age": "20",
+    "name": "alice"
+  },
+  "headers": {
+    "Accept": "*/*",
+    "Content-Length": "17",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Host": "httpbin.org",
+    "User-Agent": "curl/8.5.0",
+    "X-Amzn-Trace-Id": "Root=1-68d8dd7f-03fa73566f3703be53713741"
+  },
+（以下略）
+```
+
+Web APIでは、フォームエンコーディングではなくJSON形式でデータを
+送信することが増えています。このときには、`-d`オプションではなく
+`--json`オプションを使用します。
+
+``` bash
+curl -s 'https://httpbin.org/post' --json '{"name":"alice","age":20}' 
+```
+``` json
+{
+  "args": {},
+  "data": "{\"name\":\"alice\",\"age\":20}",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "application/json",
+    "Content-Length": "25",
+    "Content-Type": "application/json",
+    "Host": "httpbin.org",
+    "User-Agent": "curl/8.5.0",
+    "X-Amzn-Trace-Id": "Root=1-68d8df27-3286f7824e84acec473bbf66"
+  },
+  "json": {
+    "age": 20,
+    "name": "alice"
+  },
+（以下略） 
+```
+
+**問題: Yahoo! Japanの検索では、`https://search.yahoo.co.jp/search`という
+URLに対し、`p=<検索文字列>`の形式でGETリクエストを投げて検索を実行します。
+curlを使って、「阿部寛」で検索するコマンドを作ってください。**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+`--url-query`オプションを使用します。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+次の通りです。
+``` bash
+curl -s 'https://search.yahoo.co.jp/search' --url-query 'p=阿部寛'
+```
+
+記号や日本語など、URLには混ぜてはいけない文字種があります。
+このときは文字列をURLエンコーディング変換する必要があるのですが、
+`--url-query`オプションは、必要に応じて自動的に変換を行います。
+
+``` bash
+p=阿部寛
+```
+
+の部分は、URLエンコーディングされて
+
+``` bash
+p=%e9%98%bf%e9%83%a8%e5%af%9b
+```
+
+のようになります。
+:::
+
+## jq
+ここまでもJSON形式を何度か見てきました。JSON（RFC 8259）は、
+Web APIにおけるデータ交換フォーマットの事実上の標準です。
+
+JSON形式は入れ子構造をもち、行志向ではないので、古典的なUnixツール
+（sed, awk, grepなど）で処理することは適切ではありません。
+かわりにjqを使うことで、awkに匹敵する処理が可能になります。
+
+### フィルター {.unnumbered}
+[httpbin.org](https://httpbin.org/)の機能の1つに、現在の
+グローバルIPアドレスを返却するものがあります。
+
+``` bash {code-line-numbers="false"}
+curl -s 'https://httpbin.org/ip'
+```
+``` bash
+{
+  "origin": "61.25.0.94"
+}
+```
+
+結果はJSON形式で返されます。ここからIPアドレスだけを抽出するために、
+jqコマンドを使います。
+
+``` bash {code-line-numbers="false"}
+curl -s 'https://httpbin.org/ip' | jq '.origin'
+```
+``` bash
+"61.25.0.94"
+```
+
+`r`オプションを付けることで、二重引用符を取り除けます。
+
+``` bash {code-line-numbers="false"}
+curl -s 'https://httpbin.org/ip' | jq -r '.origin'
+```
+``` bash
+61.25.0.94
+```
+
+### 条件抽出 {.unnumbered}
+[DummyJSON](https://dummyjson.com/)は、いろんな種類のダミーデータを
+JSON形式で与えてくれるサイトです。ここではユーザーデータを題材にし、
+jqによるJSON操作を学習しましょう。
+
+ユーザーのダミーデータを得るには、次のようにします。（画面が流れるので、
+結果画面は省略します。）
+
+``` bash {code-line-numbers="false"}
+curl -s 'https://dummyjson.com/users' 
+```
+
+このままでは構造が不明なので、jqでパースし、先頭の10行だけを取得してみましょう。
+
+``` bash {code-line-numbers="false"}
+curl -s 'https://dummyjson.com/users' | jq | head -n 10
+```
+``` json
+{
+  "users": [
+    {
+      "id": 1,
+      "firstName": "Emily",
+      "lastName": "Johnson",
+      "maidenName": "Smith",
+      "age": 28,
+      "gender": "female",
+      "email": "emily.johnson@x.dummyjson.com",
+```
+この結果を見ると、`users`というオブジェクトの下に配列があり、
+その配列に実際のユーザーデータが存在するようです。
+
+ユーザーは何人いるのでしょうか？　配列の要素数を調べる関数が
+jqには用意されています。
+
+``` bash
+curl -s 'https://dummyjson.com/users' | jq '.users | length'
+```
+``` bash
+30
+```
+
+30人います。
+
+次に、ユーザーごとのフィールドの情報を把握するため、
+`"id": 1`のユーザー（Emily Johnson）のデータだけを取得します。
+
+``` bash
+curl -s 'https://dummyjson.com/users' | jq '.users[] | select(.id == 1)'
+```
+``` json
+{
+  "id": 1,
+  "firstName": "Emily",
+  "lastName": "Johnson",
+  "maidenName": "Smith",
+  "age": 28,
+  "gender": "female",
+  "email": "emily.johnson@x.dummyjson.com",
+  "phone": "+81 965-431-3024",
+  "username": "emilys",
+  "password": "emilyspass",
+  "birthDate": "1996-5-30",
+  "image": "https://dummyjson.com/icon/emilys/128",
+  "bloodGroup": "O-",
+  "height": 193.24,
+  "weight": 63.16,
+  "eyeColor": "Green",
+  "hair": {
+    "color": "Brown",
+    "type": "Curly"
+  },
+  "ip": "42.48.100.32",
+  "address": {
+    "address": "626 Main Street",
+    "city": "Phoenix",
+    "state": "Mississippi",
+    "stateCode": "MS",
+    "postalCode": "29112",
+    "coordinates": {
+      "lat": -77.16213,
+      "lng": -92.084824
+    },
+    "country": "United States"
+  },
+  "macAddress": "47:fa:41:18:ec:eb",
+  "university": "University of Wisconsin--Madison",
+  "bank": {
+    "cardExpire": "03/26",
+    "cardNumber": "9289760655481815",
+    "cardType": "Elo",
+    "currency": "CNY",
+    "iban": "YPUXISOBI7TTHPK2BR3HAIXL"
+  },
+  "company": {
+    "department": "Engineering",
+    "name": "Dooley, Kozey and Cronin",
+    "title": "Sales Manager",
+    "address": {
+      "address": "263 Tenth Street",
+      "city": "San Francisco",
+      "state": "Wisconsin",
+      "stateCode": "WI",
+      "postalCode": "37657",
+      "coordinates": {
+        "lat": 71.814525,
+        "lng": -161.150263
+      },
+      "country": "United States"
+    }
+  },
+  "ein": "977-175",
+  "ssn": "900-590-289",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36",
+  "crypto": {
+    "coin": "Bitcoin",
+    "wallet": "0xb9fc2fe63b2a6c003f1c324c3bfa53259162181a",
+    "network": "Ethereum (ERC20)"
+  },
+  "role": "admin"
+}
+```
+
+紙面節約のために、`firstName`、`lastName`、`age`の3つのフィールドだけを
+出力させます。
+
+``` bash
+curl -s 'https://dummyjson.com/users' | 
+jq '.users[] | select(.id == 1) | {firstName, lastName, age}'
+```
+``` json
+{
+  "firstName": "Emily",
+  "lastName": "Johnson",
+  "age": 28
+}
+```
+
+**問題: 年齢が40歳以上の人の`firstName`、`lastName`、`age`を抽出してください。**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+`select`関数の条件を変更します。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+「以上」を示す記号は`>=`です。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+40歳以上は4名存在します。
+``` bash
+curl -s 'https://dummyjson.com/users' | 
+jq '.users[] | select(.age >= 40) | {firstName, lastName, age}'
+```
+``` json
+{
+  "firstName": "Sophia",
+  "lastName": "Brown",
+  "age": 42
+}
+{
+  "firstName": "James",
+  "lastName": "Davis",
+  "age": 45
+}
+{
+  "firstName": "Noah",
+  "lastName": "Hernandez",
+  "age": 40
+}
+{
+  "firstName": "Daniel",
+  "lastName": "Cook",
+  "age": 41
+}
+```
+:::
+
+### フィールド生成 {.unnumbered}
+`firstName`と`lastName`という2つのフィールドから、`name`という
+1つのフィールドを生成するには、次のようにします。
+
+``` bash
+curl -s 'https://dummyjson.com/users' | 
+jq '.users[] | select(.id == 1) | {Name: (.firstName + " " + .lastName), age}'
+```
+
+- 文字列の結合には`+`演算子を用います。
+- `(.firstName + " " + .lastName)`によって、`<名><空白><姓>`という文字列が作られます。
+- `Name:`によって、文字列にキー名が付与されます。
+
+``` json
+{
+  "Name": "Emily Johnson",
+  "age": 28
+}
+```
+
+### CSV加工 {.unnumbered}
+jqには、配列をCSVに変換するフィルター`@csv`が用意されています。
+
+``` bash
+echo '["Emily", 28]' | jq
+```
+``` json
+[
+  "Emily",
+  28
+]
+```
+
+``` bash
+echo '["Emily", 28]' | jq -r @csv
+```
+``` json
+"Emily",28
+```
+
+**問題: 全員（30人）分の氏名と年齢とをCSV形式で出力してください。**
+
+::: {.callout-tip title="解答" collapse="true"}
+以下のようにします。
+``` bash
+curl -s 'https://dummyjson.com/users' | 
+jq -r '.users[] | [(.firstName + " " + .lastName), .age] | @csv'
+```
+
+- `[]`によって配列を作る点がポイント。
+
+``` bash
+"Emily Johnson",28
+"Michael Williams",35
+"Sophia Brown",42
+"James Davis",45
+"Emma Miller",30
+"Olivia Wilson",22
+"Alexander Jones",38
+"Ava Taylor",27
+"Ethan Martinez",33
+"Isabella Anderson",31
+"Liam Garcia",29
+"Mia Rodriguez",24
+"Noah Hernandez",40
+"Charlotte Lopez",36
+"William Gonzalez",32
+"Avery Perez",25
+"Evelyn Sanchez",37
+"Logan Torres",31
+"Abigail Rivera",28
+"Jackson Evans",34
+"Madison Collins",26
+"Elijah Stewart",33
+"Chloe Morales",39
+"Mateo Nguyen",30
+"Harper Kelly",27
+"Evelyn Gonzalez",35
+"Daniel Cook",41
+"Lily Lee",29
+"Henry Hill",38
+"Addison Wright",32
+```
+
+見出し行をつけることもできます。
+
+``` bash
+curl -s 'https://dummyjson.com/users' | 
+jq -r '["Name","Age"], (.users[] | [(.firstName + " " + .lastName), .age]) | @csv'
+```
+```
+"Name","Age"
+"Emily Johnson",28
+"Michael Williams",35
+"Sophia Brown",42
+（以下略）
+```
+:::
+
+
+## 追加課題
+この節で扱う内容の中には、授業で扱った水準を超えるものがあります。
+時間が許す場合や、より高度な内容に取り組みたいときに利用してください。
+Microsoft 365 Copilotなどの生成AIから手がかりを得てもよいかもしれません。
+
+### ヘッダーのみの表示 {.unnumbered}
+``` bash {code-line-numbers="false"}
+curl -sv 'http://abehiroshi.la.coocan.jp/'
+```
+
+を使うとリクエストやレスポンスの詳細が得られますが、
+`>`や`<`などが行の先頭に付与されたり、リクエスト・レスポンスが
+一括で見えてしまいます。リクエストヘッダーやレスポンスヘッダー
+「だけ」を出力する方法を検討しましょう。
+
+**問題: レスポンスヘッダー「だけ」を表示するには？**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+利用可能なオプションがないか、`--help all`を確認してみましょう。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+```
+ -D, --dump-header <filename> Write the received headers to <filename>
+```
+とあり、`-D`（または`--dump-header`）オプションが使えそうです。
+`<filename>`のかわりに標準出力に表示させたいときには、
+引数として`-`を渡します。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+HTML本文を表示させたくないときには、出力先に`/dev/null`を
+指定します。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+以下のようにすれば、レスポンスヘッダーだけが出力されます。
+（方法は1つとはかぎりません。同じ結果が得られれば大丈夫です。）
+``` bash {code-line-numbers="false"}
+curl -s -D - -o /dev/null 'http://abehiroshi.la.coocan.jp/'
+```
+```
+HTTP/1.1 200 OK
+Date: Sat, 27 Sep 2025 10:19:52 GMT
+Content-Type: text/html
+Content-Length: 538
+Connection: keep-alive
+Last-Modified: Wed, 09 Jul 2025 05:12:05 GMT
+ETag: "21a-639781e351da7"
+Accept-Ranges: bytes
+Server: Apache
+```
+:::
+
+
+**問題: リクエストヘッダー「だけ」を表示するには？**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+リクエストヘッダーを付加するためのcurlオプションは
+執筆時点では存在しないようです。目先を変え、
+`v`オプションで出力してから必要な行だけを抽出することを
+考えてみましょう。
+
+これらの加工には、古典的なUnixツールである
+awk, cut, grep, sedなどが使えます。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+実は、curlの`v`オプションの出力先は標準出力ではなく
+標準エラー出力です。このため、パイプで渡すためには、
+`2>&1`を加えて標準出力に乗せなければいけません。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+以下のようにすれば、リクエストヘッダーだけが出力されます。
+``` bash {code-line-numbers="false"}
+curl -sv -o /dev/null 'http://abehiroshi.la.coocan.jp/' 2>&1 | grep '^>' | cut -c3-
+```
+```
+GET / HTTP/1.1
+Host: abehiroshi.la.coocan.jp
+User-Agent: curl/8.5.0
+Accept: */*
+```
+:::
+
+### UserAgentの偽装 {.unnumbered}
+Webサイトの中には、アクセス元のデバイスによって挙動を変えるものがあります。
+以下のURLは、iPad版Google Chromeからアクセスしたときには閲覧でき、
+そうでなければ`403 Forbidden`を返すことを意図しています。
+
+もしiPadをお持ちなら、実際にアクセスしてみてください。
+
+``` bash
+curl -s 'http://www.10days.org/ipad/'
+```
+``` html
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>403 Forbidden</title>
+</head><body>
+<h1>Forbidden</h1>
+<p>You don't have permission to access this resource.</p>
+</body></html>
+```
+
+こうした制限は、実装方式によっては容易に迂回できます。上のURLでは、
+リクエストヘッダーにある`UserAgent`の値によって判定しています。
+
+**問題: curlのオプションを駆使し、上記のURLを閲覧してください。**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+```
+ -A, --user-agent <name> Send User-Agent <name> to server
+```
+とあり、`-A`（または`--user-agent`）オプションが使えそうです。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+iPad版Google ChromeのUserAgentは、Google検索するか生成AIから教えてもらえます。
+今回は、適当に
+
+```
+Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/141.0 Mobile/15E148 Safari/605.1
+```
+
+としてみましょう。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+以下のようにすれば閲覧できます。（実は`-A`には`ipad`という文字列がありさえすればよいです。）
+``` bash {code-line-numbers="false"}
+curl -s 'http://www.10days.org/ipad/' -A 'Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/141.0 Mobile/15E148 Safari/605.1'
+```
+``` html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Access Granted</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      text-align: center;
+      padding-top: 10%;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #2a7ae2;
+      margin-bottom: 0.5em;
+    }
+    p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon">🍏</div>
+  <h1>Access Granted</h1>
+  <p>You have an <strong>iPad</strong>!!</p>
+</body>
+</html>
+```
+:::
+
+### 各要素への処理 {.unnumbered}
+JSON形式の各要素に対して何らかの処理を加えたいことがあります。
+たとえば、
+
+``` bash
+curl -s 'https://dummyjson.com/users' | jq '.users[]'
+```
+
+の中には年齢（`age`）フィールドがあります。この値をすべて変化させましょう。
+
+**問題: jqを駆使し、ユーザー全員の年齢を2倍にしてください。**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+各要素に対して処理を行うフィルターには、`map`や`walk`があります。
+`map`は配列の1階層のみ、`walk`は任意の要素を再帰的にたどります。
+今回の用途では`map`で事足りるでしょう。
+
+``` bash
+echo '[1,2,3,4]' | jq 'map(. *2)'
+```
+``` json
+[
+  2,
+  4,
+  6,
+  8
+]
+```
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+更新演算子`|=`を使うと、右辺の配列の値が上書きできます。
+
+``` bash
+echo '{"matrix": [1,2,3,4]}' | jq '.matrix |= map(. * 2)'
+```
+``` json
+{
+  "matrix": [
+    2,
+    4,
+    6,
+    8
+  ]
+}
+```
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+以下のように、`.users`の中で更新演算子を使うことで実現できます。
+``` bash 
+curl -s 'https://dummyjson.com/users' | jq '.users | map(.age |= . * 2)'
+```
+:::
+
+### グループ別集計 {.unnumbered}
+JSON形式の特定の要素に着目して、集計をしたいことがあります。たとえば
+
+``` bash
+curl -s 'https://dummyjson.com/users' | jq '.users[]'
+```
+
+の中には血液型（`bloodGroup`）フィールドがあります。それぞれの血液型が
+何名いるのでしょうか？
+
+**問題: jqを駆使し、血液型別の人数を求めてください。さらに
+降順に並べてください。**
+
+::: {.callout-tip title="ヒント" collapse="true"}
+配列から集計を行うためのフィルターに、`reduce`があります。
+次のように使います。
+``` bash
+reduce <入力配列> as $var (初期値; 式)
+
+```
+
+- 入力配列: 集計したい配列
+- `$var`: ループ中の各要素を受け取る一時変数
+- 初期値: ループの初期値
+- 各要素に対して初期値を更新していく式
+
+たとえば
+
+``` bash
+echo '[1,2,3,4,5]' | jq 'reduce .[] as $x (0; . + $x)'
+```
+``` json
+15
+```
+
+`reduce`は`[1,2,3,4,5]`という配列の各要素を
+`$x`という一時変数に格納します。それらに対して加算していくので、
+結果は`1+2+3+4+5`になります。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+キーごとに集計するためのjqの慣用句があります。次のコマンドは、
+`name`フィールドごとに`score`の値を合計するためのものです。
+`reduce`以下に着目してください。
+``` bash
+echo '[{"name":"A","score":3},{"name":"B","score":5},{"name":"A","score":4}]' |
+reduce .[] as $p ({}; .[$p.name] |= ((. // 0) + $p.score))
+```
+
+- `//`は代替演算子で、`.`の値が`null`や`false`であれば`0`を返します。
+
+``` json
+{
+  "A": 7,
+  "B": 5
+}
+```
+処理をステップごとに見ていきます。
+
+1. 初期値`{}`
+1. 1人目`$p={"name":"A","score":3}`
+    - `.["A"]`は未定義 → 0
+    - 0 + 3 → 3
+    - 集計結果 → `{"A":3}`
+1. 2人目`$p={"name":"B","score":5}`
+    - `.["B"]`は未定義 → 0
+    - 0 + 5 → 5
+    -集計結果 → `{"A":3,"B":5}`
+1. 3人目`$p={"name":"A","score":4}`
+    - `.["A"]`は3
+    - 3 + 4 → 7
+    - 集計結果 → `{"A":7,"B":5}`
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+並び替えには`sort`を使いますが、`sort`はオブジェクトではなく
+配列を入力値としてとります。
+オブジェクトを配列にするためには`to_entries`、配列を
+オブジェクトにするためには`from_entries`を使います。
+
+以下では、3名分のオブジェクトの値を降順で
+ソートしています。
+
+``` bash
+echo '{"Alice":7,"Bob":5,"Charlie":9}' |
+jq '
+  to_entries
+  | sort_by(.value)
+  | reverse
+  | from_entries
+'
+```
+``` json
+{
+  "Charlie": 9,
+  "Alice": 7,
+  "Bob": 5
+}
+```
+
+::: {.callout-note}
+`jq`のパイプラインを途中で止めて、どのような結果になるか観察してください。
+:::
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+以下のように、`reduce`と`to/from_entries`とを組み合わせて処理します。
+それにしても、AB-とO-が第1位・第2位を占めていることから、これが
+明らかにダミーデータであることが分かりますね。
+``` bash 
+curl -s 'https://dummyjson.com/users' |
+jq '
+  reduce .users[] as $u ({}; .[$u.bloodGroup] |= (. // 0) + 1) |
+  to_entries |
+  sort_by(.value) |
+  reverse |
+  from_entries
+'
+```
+``` json
+{
+  "AB-": 7,
+  "O-": 6,
+  "B+": 5,
+  "AB+": 4,
+  "O+": 3,
+  "B-": 2,
+  "A-": 2,
+  "A+": 1
+}
+```
+:::
+
+## 参考資料
+- Mozilla「[開発者向けのウェブ技術](https://developer.mozilla.org/ja/docs/Web)」
+- Koichi Nakashima「[新しいcurlコマンドの使い方 完全ガイド（2025年版）](https://qiita.com/ko1nksm/items/30982a5f357f26ae166f)」
+- 杜甫々「[とほほのjq入門](https://www.tohoho-web.com/ex/jq.html)」
+

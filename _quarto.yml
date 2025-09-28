@@ -16,8 +16,6 @@ lang: ja
 format:
   html:
     theme: cosmo
-  pdf:
-    documentclass: scrreprt
 
 engine: knitr
 

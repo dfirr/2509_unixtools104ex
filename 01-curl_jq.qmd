@@ -22,7 +22,7 @@ curlのコマンドラインオプションは、以下の通りです。
 
   - `-s`: メッセージを抑制する。
 
-``` html
+``` {.html .resultblock}
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
@@ -54,7 +54,7 @@ iconvのコマンドラインオプションは、以下の通りです。
   - `-f`: 変換元の文字コード（from）
   - `-t`: 変換先の文字コード（to）
 
-``` html
+``` {.html .resultblock}
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
@@ -85,7 +85,7 @@ curl -sv 'http://abehiroshi.la.coocan.jp/'
 `-s -v`のように分割して与えることもできます。
 :::
 
-``` bash
+``` {.bash .resultblock}
 * Host abehiroshi.la.coocan.jp:80 was resolved.
 * IPv6: 2001:258:8613:5000::101
 * IPv4: 222.158.205.72
@@ -142,7 +142,7 @@ curl -sv 'http://abehiroshi.la.coocan.jp/'
 ``` bash {code-line-numbers="false"}
 curl -sv 'http://abehiroshi.la.coocan.jp/test.html'
 ```
-``` bash
+``` {.bash .resultblock}
 * Host abehiroshi.la.coocan.jp:80 was resolved.
 * IPv6: 2001:258:8613:5000::101
 * IPv4: 222.158.205.72
@@ -172,7 +172,7 @@ curl -sv 'http://abehiroshi.la.coocan.jp/test.html'
 curl -sf 'http://abehiroshi.la.coocan.jp/test.html'
 echo $?
 ```
-``` bash {code-line-numbers="false"}
+``` {.bash .resultblock}
 22
 ```
 :::
@@ -232,7 +232,7 @@ CSVファイルにアクセスします。
 ``` bash {code-line-numbers="false"}
 curl -s 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
 ```
-``` bash
+``` {.bash .resultblock}
 ength_mm,body_mass_g,sex,year
 Adelie,Torgersen,39.1,18.7,181,3750,male,2007
 Adelie,Torgersen,39.5,17.4,186,3800,female,2007
@@ -253,7 +253,7 @@ head penguins.csv -n 10
 
 - `head`は、`-n`オプションで指定した行数だけ先頭から表示するコマンドです。
 
-``` bash
+``` {.bash .resultblock}
 species,island,bill_length_mm,bill_depth_mm,flipper_length_mm,body_mass_g,sex,year
 Adelie,Torgersen,39.1,18.7,181,3750,male,2007
 Adelie,Torgersen,39.5,17.4,186,3800,female,2007
@@ -287,14 +287,14 @@ curl -s -o /dev/null -w '%{size_download}\n' 'https://raw.githubusercontent.com/
 
 - `/dev/null`は、Unixでのゴミ捨て場です。ファイルを何も保存しないことになります。
 
-``` bash {code-line-numbers="false"}
+``` {.bash .resultblock}
 15241
 ```
 
 ``` bash {code-line-numbers="false"}
 curl -s -o /dev/null -w '%{size_download}\n' --compressed 'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'
 ```
-``` bash
+``` {.bash .resultblock}
 2976
 ```
 
@@ -331,7 +331,7 @@ GETメソッドでパラメーターを送信する際には、`--url-query`オ�
 ``` bash
 curl -s 'https://httpbin.org/get' --url-query 'name=alice' --url-query 'age=20' 
 ```
-``` json
+``` {.json .resultblock}
 {
   "args": {
     "age": "20",
@@ -359,7 +359,7 @@ curl -s 'https://httpbin.org/post' -d 'name=alice' -d 'age=20'
 
 - オプションの並び順は順不同です。`-d`オプションを最初にしてもかまいません。
 
-``` json
+``` {.json .resultblock}
 {
   "args": {},
   "data": "",
@@ -386,7 +386,7 @@ Web APIでは、フォームエンコーディングではなくJSON形式でデ
 ``` bash
 curl -s 'https://httpbin.org/post' --json '{"name":"alice","age":20}' 
 ```
-``` json
+``` {.json .resultblock}
 {
   "args": {},
   "data": "{\"name\":\"alice\",\"age\":20}",
@@ -425,13 +425,13 @@ curl -s 'https://search.yahoo.co.jp/search' --url-query 'p=阿部寛'
 このときは文字列をURLエンコーディング変換する必要があるのですが、
 `--url-query`オプションは、必要に応じて自動的に変換を行います。
 
-``` bash
+``` {.resultblock}
 p=阿部寛
 ```
 
 の部分は、URLエンコーディングされて
 
-``` bash
+``` {.resultblock}
 p=%e9%98%bf%e9%83%a8%e5%af%9b
 ```
 
@@ -453,7 +453,7 @@ JSON形式は入れ子構造をもち、行志向ではないので、古典的�
 ``` bash {code-line-numbers="false"}
 curl -s 'https://httpbin.org/ip'
 ```
-``` bash
+``` {.json .resultblock}
 {
   "origin": "61.25.0.94"
 }
@@ -465,7 +465,7 @@ jqコマンドを使います。
 ``` bash {code-line-numbers="false"}
 curl -s 'https://httpbin.org/ip' | jq '.origin'
 ```
-``` bash
+``` {.json .resultblock}
 "61.25.0.94"
 ```
 
@@ -474,7 +474,7 @@ curl -s 'https://httpbin.org/ip' | jq '.origin'
 ``` bash {code-line-numbers="false"}
 curl -s 'https://httpbin.org/ip' | jq -r '.origin'
 ```
-``` bash
+``` {.json .resultblock}
 61.25.0.94
 ```
 
@@ -495,7 +495,7 @@ curl -s 'https://dummyjson.com/users'
 ``` bash {code-line-numbers="false"}
 curl -s 'https://dummyjson.com/users' | jq | head -n 10
 ```
-``` json
+``` {.json .resultblock}
 {
   "users": [
     {
@@ -516,7 +516,7 @@ jqには用意されています。
 ``` bash
 curl -s 'https://dummyjson.com/users' | jq '.users | length'
 ```
-``` bash
+``` {.json .resultblock}
 30
 ```
 
@@ -528,7 +528,7 @@ curl -s 'https://dummyjson.com/users' | jq '.users | length'
 ``` bash
 curl -s 'https://dummyjson.com/users' | jq '.users[] | select(.id == 1)'
 ```
-``` json
+``` {.json .resultblock}
 {
   "id": 1,
   "firstName": "Emily",
@@ -608,7 +608,7 @@ curl -s 'https://dummyjson.com/users' | jq '.users[] | select(.id == 1)'
 curl -s 'https://dummyjson.com/users' | 
 jq '.users[] | select(.id == 1) | {firstName, lastName, age}'
 ```
-``` json
+``` {.json .resultblock}
 {
   "firstName": "Emily",
   "lastName": "Johnson",
@@ -632,7 +632,7 @@ jq '.users[] | select(.id == 1) | {firstName, lastName, age}'
 curl -s 'https://dummyjson.com/users' | 
 jq '.users[] | select(.age >= 40) | {firstName, lastName, age}'
 ```
-``` json
+``` {.json .resultblock}
 {
   "firstName": "Sophia",
   "lastName": "Brown",
@@ -669,7 +669,7 @@ jq '.users[] | select(.id == 1) | {Name: (.firstName + " " + .lastName), age}'
 - `(.firstName + " " + .lastName)`によって、`<名><空白><姓>`という文字列が作られます。
 - `Name:`によって、文字列にキー名が付与されます。
 
-``` json
+``` {.json .resultblock}
 {
   "Name": "Emily Johnson",
   "age": 28
@@ -682,7 +682,7 @@ jqには、配列をCSVに変換するフィルター`@csv`が用意されてい
 ``` bash
 echo '["Emily", 28]' | jq
 ```
-``` json
+``` {.json .resultblock}
 [
   "Emily",
   28
@@ -692,7 +692,7 @@ echo '["Emily", 28]' | jq
 ``` bash
 echo '["Emily", 28]' | jq -r @csv
 ```
-``` json
+``` {.json .resultblock}
 "Emily",28
 ```
 
@@ -707,7 +707,7 @@ jq -r '.users[] | [(.firstName + " " + .lastName), .age] | @csv'
 
 - `[]`によって配列を作る点がポイント。
 
-``` bash
+``` {.json .resultblock}
 "Emily Johnson",28
 "Michael Williams",35
 "Sophia Brown",42
@@ -746,7 +746,7 @@ jq -r '.users[] | [(.firstName + " " + .lastName), .age] | @csv'
 curl -s 'https://dummyjson.com/users' | 
 jq -r '["Name","Age"], (.users[] | [(.firstName + " " + .lastName), .age]) | @csv'
 ```
-```
+``` {.json .resultblock}
 "Name","Age"
 "Emily Johnson",28
 "Michael Williams",35
@@ -778,7 +778,7 @@ curl -sv 'http://abehiroshi.la.coocan.jp/'
 :::
 
 ::: {.callout-tip title="ヒント" collapse="true"}
-```
+``` {.resultblock}
  -D, --dump-header <filename> Write the received headers to <filename>
 ```
 とあり、`-D`（または`--dump-header`）オプションが使えそうです。
@@ -797,7 +797,7 @@ HTML本文を表示させたくないときには、出力先に`/dev/null`を
 ``` bash {code-line-numbers="false"}
 curl -s -D - -o /dev/null 'http://abehiroshi.la.coocan.jp/'
 ```
-```
+``` {.bash .resultblock}
 HTTP/1.1 200 OK
 Date: Sat, 27 Sep 2025 10:19:52 GMT
 Content-Type: text/html
@@ -834,7 +834,7 @@ awk, cut, grep, sedなどが使えます。
 ``` bash {code-line-numbers="false"}
 curl -sv -o /dev/null 'http://abehiroshi.la.coocan.jp/' 2>&1 | grep '^>' | cut -c3-
 ```
-```
+``` {.bash .resultblock}
 GET / HTTP/1.1
 Host: abehiroshi.la.coocan.jp
 User-Agent: curl/8.5.0
@@ -852,7 +852,7 @@ Webサイトの中には、アクセス元のデバイスによって挙動を�
 ``` bash
 curl -s 'http://www.10days.org/ipad/'
 ```
-``` html
+``` {.html .resultblock}
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
 <title>403 Forbidden</title>
@@ -868,7 +868,7 @@ curl -s 'http://www.10days.org/ipad/'
 **問題: curlのオプションを駆使し、上記のURLを閲覧してください。**
 
 ::: {.callout-tip title="ヒント" collapse="true"}
-```
+``` {.resultblock}
  -A, --user-agent <name> Send User-Agent <name> to server
 ```
 とあり、`-A`（または`--user-agent`）オプションが使えそうです。
@@ -876,9 +876,9 @@ curl -s 'http://www.10days.org/ipad/'
 
 ::: {.callout-tip title="ヒント" collapse="true"}
 iPad版Google ChromeのUserAgentは、Google検索するか生成AIから教えてもらえます。
-今回は、適当に
+今回は、
 
-```
+``` {.resultblock}
 Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/141.0 Mobile/15E148 Safari/605.1
 ```
 
@@ -890,7 +890,7 @@ Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like 
 ``` bash {code-line-numbers="false"}
 curl -s 'http://www.10days.org/ipad/' -A 'Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/141.0 Mobile/15E148 Safari/605.1'
 ```
-``` html
+``` {.html .resultblock}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -948,7 +948,7 @@ curl -s 'https://dummyjson.com/users' | jq '.users[]'
 ``` bash
 echo '[1,2,3,4]' | jq 'map(. *2)'
 ```
-``` json
+``` {.json .resultblock}
 [
   2,
   4,
@@ -964,7 +964,7 @@ echo '[1,2,3,4]' | jq 'map(. *2)'
 ``` bash
 echo '{"matrix": [1,2,3,4]}' | jq '.matrix |= map(. * 2)'
 ```
-``` json
+``` {.json .resultblock}
 {
   "matrix": [
     2,
@@ -999,7 +999,7 @@ curl -s 'https://dummyjson.com/users' | jq '.users[]'
 ::: {.callout-tip title="ヒント" collapse="true"}
 配列から集計を行うためのフィルターに、`reduce`があります。
 次のように使います。
-``` bash
+``` {.html .resultblock}
 reduce <入力配列> as $var (初期値; 式)
 
 ```
@@ -1014,7 +1014,7 @@ reduce <入力配列> as $var (初期値; 式)
 ``` bash
 echo '[1,2,3,4,5]' | jq 'reduce .[] as $x (0; . + $x)'
 ```
-``` json
+``` {.json .resultblock}
 15
 ```
 
@@ -1034,7 +1034,7 @@ reduce .[] as $p ({}; .[$p.name] |= ((. // 0) + $p.score))
 
 - `//`は代替演算子で、`.`の値が`null`や`false`であれば右辺（`0`）を返します。
 
-``` json
+``` {.json .resultblock}
 {
   "A": 7,
   "B": 5
@@ -1075,7 +1075,7 @@ jq '
   | from_entries
 '
 ```
-``` json
+``` {.json .resultblock}
 {
   "Charlie": 9,
   "Alice": 7,
@@ -1102,7 +1102,7 @@ jq '
   from_entries
 '
 ```
-``` json
+``` {.json .resultblock}
 {
   "AB-": 7,
   "O-": 6,

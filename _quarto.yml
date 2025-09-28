@@ -16,6 +16,7 @@ lang: ja
 format:
   html:
     theme: cosmo
+    css: styles.css
 
 filters:
   - cjk_line_breaks_filter.lua

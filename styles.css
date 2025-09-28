@@ -1,0 +1,11 @@
+.resultblock {
+  background-color: #fffaf0 !important; /* pale orange (floral white) */
+}
+
+pre.sourceCode.resultblock.code-with-copy,
+pre.sourceCode.resultblock.code-with-copy code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-x: hidden !important;
+  display: block !important;
+}

@@ -2,7 +2,7 @@ project:
   type: book
 
 book:
-  title: Unix Tools 104 -- Excercise
+  title: Unix Tools 104 -- Workbook
   author: Shintaro Watanabe
   date: 2025-10-10
   chapters:
@@ -16,6 +16,9 @@ lang: ja
 format:
   html:
     theme: cosmo
+
+filters:
+  - cjk_line_breaks_filter.lua
 
 engine: knitr
 

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1&nbsp; Web APIの処理（curl, jq） – Unix Tools 104 -- Excercise</title>
+<title>1&nbsp; Web APIの処理（curl, jq） – Unix Tools 104 -- Workbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -129,7 +129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Unix Tools 104 – Excercise</a> 
+      <a href="./">Unix Tools 104 – Workbook</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="必要な準備" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="必要な準備"><span class="header-section-number">1.2</span> 必要な準備</h2>
-<p>PCでWSL（Windows Subsystem for Linux）が使えるようになっている 必要があります。</p>
+<p>PCでWSL（Windows Subsystem for Linux）が使えるようになっている必要があります。</p>
 </section>
 <section id="curl" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="curl"><span class="header-section-number">1.3</span> curl</h2>
@@ -250,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">noframes</span><span class="dt">&gt;</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">frameset</span><span class="dt">&gt;</span></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>HTML形式で表示されていますが、<code>&lt;title&gt;</code>タグの内容が文字化けしています。 これは、このホームページが今どき珍しくShift_JIS文字コードでエンコーディング されているのに対し、WSLのコンソールはUTF-8文字コードを前提としているためです。</p>
+<p>HTML形式で表示されていますが、<code>&lt;title&gt;</code>タグの内容が文字化けしています。これは、このホームページが今どき珍しくShift_JIS文字コードでエンコーディングされているのに対し、WSLのコンソールはUTF-8文字コードを前提としているためです。</p>
 <p>パイプ（<code>|</code>）を使って、Shift_JISをUTF-8に変換して出力します。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'http://abehiroshi.la.coocan.jp/'</span> <span class="kw">|</span> <span class="fu">iconv</span> <span class="at">-f</span> sjis <span class="at">-t</span> utf8</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>iconvのコマンドラインオプションは、以下の通りです。</p>
@@ -276,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="詳細表示" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="詳細表示">詳細表示</h3>
-<p><code>-v</code>オプションを追加することで、HTTPリクエストやレスポンスの内容、 その他の付加情報が得られます。</p>
+<p><code>-v</code>オプションを追加することで、HTTPリクエストやレスポンスの内容、その他の付加情報が得られます。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sv</span> <span class="st">'http://abehiroshi.la.coocan.jp/'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -288,7 +288,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>オプションを<code>-sv</code>のように一括して与えることも、 <code>-s -v</code>のように分割して与えることもできます。</p>
+<p>オプションを<code>-sv</code>のように一括して与えることも、<code>-s -v</code>のように分割して与えることもできます。</p>
 </div>
 </div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Host abehiroshi.la.coocan.jp:80 was resolved.</span>
@@ -313,7 +313,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span></span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>html<span class="op">&gt;</span></span>
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="ex">（以下略）</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>&gt;</code>ではじまる行がリクエスト（クライアント to サーバー）を、 <code>&lt;</code>ではじまる行がレスポンス（サーバー to クライアント）を、 <code>*</code>ではじまる行が付加情報を意味します。</p>
+<p><code>&gt;</code>ではじまる行がリクエスト（クライアント to サーバー）を、<code>&lt;</code>ではじまる行がレスポンス（サーバー to クライアント）を、<code>*</code>ではじまる行が付加情報を意味します。</p>
 <p>リクエストとレスポンスとの内容に注目し、以下の問いに答えてください。</p>
 <p><strong>問題: HTTPのバージョンは何でしょうか？</strong></p>
 <div class="callout callout-style-default callout-tip callout-titled" title="解答">
@@ -369,7 +369,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="ステータスコード" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="ステータスコード">ステータスコード</h3>
-<p>200以外のステータスコードを得てみます。 「阿部寛のホームページ」には存在しないページに対して リクエストを出すと、404（Not Found）のエラーが返るはずです。</p>
+<p>200以外のステータスコードを得てみます。「阿部寛のホームページ」には存在しないページに対してリクエストを出すと、404（Not Found）のエラーが返るはずです。</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sv</span> <span class="st">'http://abehiroshi.la.coocan.jp/test.html'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> Host abehiroshi.la.coocan.jp:80 was resolved.</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">*</span> IPv6: 2001:258:8613:5000::101</span>
@@ -398,7 +398,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>-f</code>オプションを付ると、400番台・500番台のステータスコードが サーバーから帰ってきた場合に、curlがエラー終了します。</p>
+<p><code>-f</code>オプションを付ると、400番台・500番台のステータスコードがサーバーから帰ってきた場合に、curlがエラー終了します。</p>
 <p>エラー終了した場合には、bashの<code>$?</code>が0以外の値になります。</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sf</span> <span class="st">'http://abehiroshi.la.coocan.jp/test.html'</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -436,7 +436,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>1つ1つのコードの意味は、<a href="https://developer.mozilla.org/ja/docs/Web/HTTP/Reference/Status">Mozillaのページ</a>で 確認できます。Mozillaのページを参照し、以下の問いに答えてください。</p>
+<p>1つ1つのコードの意味は、<a href="https://developer.mozilla.org/ja/docs/Web/HTTP/Reference/Status">Mozillaのページ</a>で確認できます。Mozillaのページを参照し、以下の問いに答えてください。</p>
 <p><strong>問題: 「Bad Gateway」のステータスコードは何番ですか？</strong></p>
 <div class="callout callout-style-default callout-tip callout-titled" title="解答">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
@@ -467,7 +467,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>今回の移転が永続的であれば、<code>301 Moved Permanently</code>が適切です。一方で、 メンテナンス中など一時的な移転であれば<code>307 Temporary Redirect</code>を返すのが適切です。</p>
+<p>今回の移転が永続的であれば、<code>301 Moved Permanently</code>が適切です。一方で、メンテナンス中など一時的な移転であれば<code>307 Temporary Redirect</code>を返すのが適切です。</p>
 </div>
 </div>
 </div>
@@ -484,7 +484,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>このようなWeb API上の制限は、一般にRate Limitと呼ばれます。 Rate Limitを示すステータスコードは、<code>429 Too Many Requests</code>です。</p>
+<p>このようなWeb API上の制限は、一般にRate Limitと呼ばれます。Rate Limitを示すステータスコードは、<code>429 Too Many Requests</code>です。</p>
 </div>
 </div>
 </div>
@@ -501,15 +501,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>認証に失敗した場合には、<code>401 Unauthorized</code>を返します。 <code>403 Forbidden</code>は、認証には成功している（もしくは認証機構がない）けれども アクセス権がない場合に返すステータスコートです。</p>
-<p>ただし、実際のWebアプリでは、認証に失敗したときに<code>200 OK</code>が 返ってくることも多々あります。</p>
+<p>認証に失敗した場合には、<code>401 Unauthorized</code>を返します。<code>403 Forbidden</code>は、認証には成功している（もしくは認証機構がない）けれどもアクセス権がない場合に返すステータスコートです。</p>
+<p>ただし、実際のWebアプリでは、認証に失敗したときに<code>200 OK</code>が返ってくることも多々あります。</p>
 </div>
 </div>
 </div>
 </section>
 <section id="出力制御" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="出力制御">出力制御</h3>
-<p>統計分析の入門用データセットに使用される<a href="https://github.com/allisonhorst/palmerpenguins">Palmer Penguins</a>の CSVファイルにアクセスします。</p>
+<p>統計分析の入門用データセットに使用される<a href="https://github.com/allisonhorst/palmerpenguins">Palmer Penguins</a>のCSVファイルにアクセスします。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ength_mm,body_mass_g,sex,year</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Adelie,Torgersen,39.1,18.7,181,3750,male,2007</span></span>
@@ -517,7 +517,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Adelie,Torgersen,40.3,18,195,3250,female,2007</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Adelie,Torgersen,NA,NA,NA,NA,NA,2007</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">（以下略）</span> </span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>-o</code>オプションで、レスポンス内容をファイル出力できます。このときファイル名の指定が 必要ですが、<code>-O</code>オプションををつけるとサーバー上のファイル名で保存されます。</p>
+<p><code>-o</code>オプションで、レスポンス内容をファイル出力できます。このときファイル名の指定が必要ですが、<code>-O</code>オプションををつけるとサーバー上のファイル名で保存されます。</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-O</span> <span class="st">'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> penguins.csv <span class="at">-n</span> 10</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
@@ -562,7 +562,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>圧縮転送の効果を確認したければ、実際のダウンロード量を測定すればよいでしょう。 <code>-w</code>オプションと<code>%{size_download}</code>という変数の組み合わせで実現できます。</p>
+<p>圧縮転送の効果を確認したければ、実際のダウンロード量を測定すればよいでしょう。<code>-w</code>オプションと<code>%{size_download}</code>という変数の組み合わせで実現できます。</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-o</span> /dev/null <span class="at">-w</span> <span class="st">'%{size_download}\n'</span> <span class="st">'https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li><code>/dev/null</code>は、Unixでのゴミ捨て場です。ファイルを何も保存しないことになります。</li>
@@ -576,8 +576,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="メソッド" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="メソッド">メソッド</h3>
-<p>クライアントからサーバーにアクセスするとき、検索文字列やユーザー名など、 パラメーターを送りたいときがあります。</p>
-<p>パラメーターを送る手法として、<code>GET</code>メソッドを使うケースと、<code>POST</code>メソッドを 使うケースとがあります。違いを以下に整理します。</p>
+<p>クライアントからサーバーにアクセスするとき、検索文字列やユーザー名など、パラメーターを送りたいときがあります。</p>
+<p>パラメーターを送る手法として、<code>GET</code>メソッドを使うケースと、<code>POST</code>メソッドを使うケースとがあります。違いを以下に整理します。</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 35%">
@@ -614,7 +614,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p><a href="https://httpbin.org/">httpbin.org</a>は、HTTPクライアントのテスト用に作られたサービスです。 その中に、こちらで送信したパラメーターをJSON形式で返却してくれる機能があります。 GETを待ち受けるURLは<code>https://httpbin.org/get</code>、POSTを待ち受けるURLは<code>https://httpbin.org/post</code>です。</p>
+<p><a href="https://httpbin.org/">httpbin.org</a>は、HTTPクライアントのテスト用に作られたサービスです。その中に、こちらで送信したパラメーターをJSON形式で返却してくれる機能があります。GETを待ち受けるURLは<code>https://httpbin.org/get</code>、POSTを待ち受けるURLは<code>https://httpbin.org/post</code>です。</p>
 <p>以下のパラメーターの組を、<code>GET</code>と<code>POST</code>とで送ってみましょう。</p>
 <table class="caption-top table">
 <thead>
@@ -630,7 +630,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>GETメソッドでパラメーターを送信する際には、<code>--url-query</code>オプションを使用します。 <code>https://httpbin.org/get</code>に対して、上のパラメーターの組を送信する例を示します。</p>
+<p>GETメソッドでパラメーターを送信する際には、<code>--url-query</code>オプションを使用します。<code>https://httpbin.org/get</code>に対して、上のパラメーターの組を送信する例を示します。</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://httpbin.org/get'</span> <span class="at">--url-query</span> <span class="st">'name=alice'</span> <span class="at">--url-query</span> <span class="st">'age=20'</span> </span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{</span></span>
@@ -638,10 +638,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"alice"</span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="er">（以下略）</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>args</code>オブジェクトの中に、<code>name</code>と<code>age</code>とが適切に格納されています。 このように、<code>--url-query</code>オプションを重ねて使うことで、複数のパラメーターが 送信できます。</p>
+<p><code>args</code>オブジェクトの中に、<code>name</code>と<code>age</code>とが適切に格納されています。このように、<code>--url-query</code>オプションを重ねて使うことで、複数のパラメーターが送信できます。</p>
 <p>POSTメソッドでパラメーターを送信する際には、いくつかの流儀があります。</p>
-<p>古典的にはフォームエンコーディングが使用されます。これは埋め込むデータ自体は <code>--url-query</code>と同じなのですが、埋め込む先がURLではなくリクエストボディ（本文）に なっています。</p>
-<p>curlでは、<code>-d</code>オプションを使ってパラメーターを送信すれば、 デフォルトでフォームエンコーディングになります。</p>
+<p>古典的にはフォームエンコーディングが使用されます。これは埋め込むデータ自体は<code>--url-query</code>と同じなのですが、埋め込む先がURLではなくリクエストボディ（本文）になっています。</p>
+<p>curlでは、<code>-d</code>オプションを使ってパラメーターを送信すれば、デフォルトでフォームエンコーディングになります。</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://httpbin.org/post'</span> <span class="at">-d</span> <span class="st">'name=alice'</span> <span class="at">-d</span> <span class="st">'age=20'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>オプションの並び順は順不同です。<code>-d</code>オプションを最初にしてもかまいません。</li>
@@ -663,7 +663,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"X-Amzn-Trace-Id"</span><span class="fu">:</span> <span class="st">"Root=1-68d8dd7f-03fa73566f3703be53713741"</span></span>
 <span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
 <span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="er">（以下略）</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Web APIでは、フォームエンコーディングではなくJSON形式でデータを 送信することが増えています。このときには、<code>-d</code>オプションではなく <code>--json</code>オプションを使用します。</p>
+<p>Web APIでは、フォームエンコーディングではなくJSON形式でデータを送信することが増えています。このときには、<code>-d</code>オプションではなく<code>--json</code>オプションを使用します。</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://httpbin.org/post'</span> <span class="at">--json</span> <span class="st">'{"name":"alice","age":20}'</span> </span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb26"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{},</span></span>
@@ -714,7 +714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="callout-body-container callout-body">
 <p>次の通りです。</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://search.yahoo.co.jp/search'</span> <span class="at">--url-query</span> <span class="st">'p=阿部寛'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>記号や日本語など、URLには混ぜてはいけない文字種があります。 このときは文字列をURLエンコーディング変換する必要があるのですが、 <code>--url-query</code>オプションは、必要に応じて自動的に変換を行います。</p>
+<p>記号や日本語など、URLには混ぜてはいけない文字種があります。このときは文字列をURLエンコーディング変換する必要があるのですが、<code>--url-query</code>オプションは、必要に応じて自動的に変換を行います。</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="va">p</span><span class="op">=</span>阿部寛</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>の部分は、URLエンコーディングされて</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="va">p</span><span class="op">=</span>%e9%98%bf%e9%83%a8%e5%af%9b</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -726,16 +726,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="jq" class="level2" data-number="1.4">
 <h2 data-number="1.4" class="anchored" data-anchor-id="jq"><span class="header-section-number">1.4</span> jq</h2>
-<p>ここまでもJSON形式を何度か見てきました。JSON（RFC 8259）は、 Web APIにおけるデータ交換フォーマットの事実上の標準です。</p>
-<p>JSON形式は入れ子構造をもち、行志向ではないので、古典的なUnixツール （sed, awk, grepなど）で処理することは適切ではありません。 かわりにjqを使うことで、awkに匹敵する処理が可能になります。</p>
+<p>ここまでもJSON形式を何度か見てきました。JSON（RFC 8259）は、Web APIにおけるデータ交換フォーマットの事実上の標準です。</p>
+<p>JSON形式は入れ子構造をもち、行志向ではないので、古典的なUnixツール（sed, awk, grepなど）で処理することは適切ではありません。かわりにjqを使うことで、awkに匹敵する処理が可能になります。</p>
 <section id="フィルター" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="フィルター">フィルター</h3>
-<p><a href="https://httpbin.org/">httpbin.org</a>の機能の1つに、現在の グローバルIPアドレスを返却するものがあります。</p>
+<p><a href="https://httpbin.org/">httpbin.org</a>の機能の1つに、現在のグローバルIPアドレスを返却するものがあります。</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://httpbin.org/ip'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"origin"</span><span class="ex">:</span> <span class="st">"61.25.0.94"</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>結果はJSON形式で返されます。ここからIPアドレスだけを抽出するために、 jqコマンドを使います。</p>
+<p>結果はJSON形式で返されます。ここからIPアドレスだけを抽出するために、jqコマンドを使います。</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://httpbin.org/ip'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'.origin'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="st">"61.25.0.94"</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><code>r</code>オプションを付けることで、二重引用符を取り除けます。</p>
@@ -744,8 +744,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="条件抽出" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="条件抽出">条件抽出</h3>
-<p><a href="https://dummyjson.com/">DummyJSON</a>は、いろんな種類のダミーデータを JSON形式で与えてくれるサイトです。ここではユーザーデータを題材にし、 jqによるJSON操作を学習しましょう。</p>
-<p>ユーザーのダミーデータを得るには、次のようにします。（画面が流れるので、 結果画面は省略します。）</p>
+<p><a href="https://dummyjson.com/">DummyJSON</a>は、いろんな種類のダミーデータをJSON形式で与えてくれるサイトです。ここではユーザーデータを題材にし、jqによるJSON操作を学習しましょう。</p>
+<p>ユーザーのダミーデータを得るには、次のようにします。（画面が流れるので、結果画面は省略します。）</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> </span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>このままでは構造が不明なので、jqでパースし、先頭の10行だけを取得してみましょう。</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 10</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -759,12 +759,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"age"</span><span class="fu">:</span> <span class="dv">28</span><span class="fu">,</span></span>
 <span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"gender"</span><span class="fu">:</span> <span class="st">"female"</span><span class="fu">,</span></span>
 <span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"email"</span><span class="fu">:</span> <span class="st">"emily.johnson@x.dummyjson.com"</span><span class="fu">,</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>この結果を見ると、<code>users</code>というオブジェクトの下に配列があり、 その配列に実際のユーザーデータが存在するようです。</p>
-<p>ユーザーは何人いるのでしょうか？　配列の要素数を調べる関数が jqには用意されています。</p>
+<p>この結果を見ると、<code>users</code>というオブジェクトの下に配列があり、その配列に実際のユーザーデータが存在するようです。</p>
+<p>ユーザーは何人いるのでしょうか？　配列の要素数を調べる関数がjqには用意されています。</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'.users | length'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="ex">30</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>30人います。</p>
-<p>次に、ユーザーごとのフィールドの情報を把握するため、 <code>"id": 1</code>のユーザー（Emily Johnson）のデータだけを取得します。</p>
+<p>次に、ユーザーごとのフィールドの情報を把握するため、<code>"id": 1</code>のユーザー（Emily Johnson）のデータだけを取得します。</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'.users[] | select(.id == 1)'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb42"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"id"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
@@ -836,7 +836,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb42-68"><a href="#cb42-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
 <span id="cb42-69"><a href="#cb42-69" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"role"</span><span class="fu">:</span> <span class="st">"admin"</span></span>
 <span id="cb42-70"><a href="#cb42-70" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>紙面節約のために、<code>firstName</code>、<code>lastName</code>、<code>age</code>の3つのフィールドだけを 出力させます。</p>
+<p>紙面節約のために、<code>firstName</code>、<code>lastName</code>、<code>age</code>の3つのフィールドだけを出力させます。</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> </span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jq</span> <span class="st">'.users[] | select(.id == 1) | {firstName, lastName, age}'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb44"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
@@ -918,7 +918,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="フィールド生成" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="フィールド生成">フィールド生成</h3>
-<p><code>firstName</code>と<code>lastName</code>という2つのフィールドから、<code>name</code>という 1つのフィールドを生成するには、次のようにします。</p>
+<p><code>firstName</code>と<code>lastName</code>という2つのフィールドから、<code>name</code>という1つのフィールドを生成するには、次のようにします。</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> </span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jq</span> <span class="st">'.users[] | select(.id == 1) | {Name: (.firstName + " " + .lastName), age}'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
@@ -1005,11 +1005,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="追加課題" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="追加課題"><span class="header-section-number">1.5</span> 追加課題</h2>
-<p>この節で扱う内容の中には、授業で扱った水準を超えるものがあります。 時間が許す場合や、より高度な内容に取り組みたいときに利用してください。 Microsoft 365 Copilotなどの生成AIから手がかりを得てもよいかもしれません。</p>
+<p>この節で扱う内容の中には、授業で扱った水準を超えるものがあります。時間が許す場合や、より高度な内容に取り組みたいときに利用してください。Microsoft 365 Copilotなどの生成AIから手がかりを得てもよいかもしれません。</p>
 <section id="ヘッダーのみの表示" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="ヘッダーのみの表示">ヘッダーのみの表示</h3>
 <div class="sourceCode" id="cb57"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sv</span> <span class="st">'http://abehiroshi.la.coocan.jp/'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>を使うとリクエストやレスポンスの詳細が得られますが、 <code>&gt;</code>や<code>&lt;</code>などが行の先頭に付与されたり、リクエスト・レスポンスが 一括で見えてしまいます。リクエストヘッダーやレスポンスヘッダー 「だけ」を出力する方法を検討しましょう。</p>
+<p>を使うとリクエストやレスポンスの詳細が得られますが、<code>&gt;</code>や<code>&lt;</code>などが行の先頭に付与されたり、リクエスト・レスポンスが一括で見えてしまいます。リクエストヘッダーやレスポンスヘッダー「だけ」を出力する方法を検討しましょう。</p>
 <p><strong>問題: レスポンスヘッダー「だけ」を表示するには？</strong></p>
 <div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
@@ -1040,7 +1040,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="callout-19" class="callout-19-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <pre><code> -D, --dump-header &lt;filename&gt; Write the received headers to &lt;filename&gt;</code></pre>
-<p>とあり、<code>-D</code>（または<code>--dump-header</code>）オプションが使えそうです。 <code>&lt;filename&gt;</code>のかわりに標準出力に表示させたいときには、 引数として<code>-</code>を渡します。</p>
+<p>とあり、<code>-D</code>（または<code>--dump-header</code>）オプションが使えそうです。<code>&lt;filename&gt;</code>のかわりに標準出力に表示させたいときには、引数として<code>-</code>を渡します。</p>
 </div>
 </div>
 </div>
@@ -1056,7 +1056,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="callout-20" class="callout-20-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>HTML本文を表示させたくないときには、出力先に<code>/dev/null</code>を 指定します。</p>
+<p>HTML本文を表示させたくないときには、出力先に<code>/dev/null</code>を指定します。</p>
 </div>
 </div>
 </div>
@@ -1072,7 +1072,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div id="callout-21" class="callout-21-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>以下のようにすれば、レスポンスヘッダーだけが出力されます。 （方法は1つとはかぎりません。同じ結果が得られれば大丈夫です。）</p>
+<p>以下のようにすれば、レスポンスヘッダーだけが出力されます。（方法は1つとはかぎりません。同じ結果が得られれば大丈夫です。）</p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-D</span> <span class="at">-</span> <span class="at">-o</span> /dev/null <span class="st">'http://abehiroshi.la.coocan.jp/'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre><code>HTTP/1.1 200 OK
 Date: Sat, 27 Sep 2025 10:19:52 GMT
@@ -1099,8 +1099,8 @@ Server: Apache</code></pre>
 </div>
 <div id="callout-22" class="callout-22-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>リクエストヘッダーを付加するためのcurlオプションは 執筆時点では存在しないようです。目先を変え、 <code>v</code>オプションで出力してから必要な行だけを抽出することを 考えてみましょう。</p>
-<p>これらの加工には、古典的なUnixツールである awk, cut, grep, sedなどが使えます。</p>
+<p>リクエストヘッダーを付加するためのcurlオプションは執筆時点では存在しないようです。目先を変え、<code>v</code>オプションで出力してから必要な行だけを抽出することを考えてみましょう。</p>
+<p>これらの加工には、古典的なUnixツールであるawk, cut, grep, sedなどが使えます。</p>
 </div>
 </div>
 </div>
@@ -1116,7 +1116,7 @@ Server: Apache</code></pre>
 </div>
 <div id="callout-23" class="callout-23-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>実は、curlの<code>v</code>オプションの出力先は標準出力ではなく 標準エラー出力です。このため、パイプで渡すためには、 <code>2&gt;&amp;1</code>を加えて標準出力に乗せなければいけません。</p>
+<p>実は、curlの<code>v</code>オプションの出力先は標準出力ではなく標準エラー出力です。このため、パイプで渡すためには、<code>2&gt;&amp;1</code>を加えて標準出力に乗せなければいけません。</p>
 </div>
 </div>
 </div>
@@ -1144,7 +1144,7 @@ Accept: */*</code></pre>
 </section>
 <section id="useragentの偽装" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="useragentの偽装">UserAgentの偽装</h3>
-<p>Webサイトの中には、アクセス元のデバイスによって挙動を変えるものがあります。 以下のURLは、iPad版Google Chromeからアクセスしたときには閲覧でき、 そうでなければ<code>403 Forbidden</code>を返すことを意図しています。</p>
+<p>Webサイトの中には、アクセス元のデバイスによって挙動を変えるものがあります。以下のURLは、iPad版Google Chromeからアクセスしたときには閲覧でき、そうでなければ<code>403 Forbidden</code>を返すことを意図しています。</p>
 <p>もしiPadをお持ちなら、実際にアクセスしてみてください。</p>
 <div class="sourceCode" id="cb63"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'http://www.10days.org/ipad/'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb64"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;!DOCTYPE</span> HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"<span class="dt">&gt;</span></span>
@@ -1154,7 +1154,7 @@ Accept: */*</code></pre>
 <span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Forbidden<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
 <span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="dt">&gt;</span>You don't have permission to access this resource.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
 <span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>こうした制限は、実装方式によっては容易に迂回できます。上のURLでは、 リクエストヘッダーにある<code>UserAgent</code>の値によって判定しています。</p>
+<p>こうした制限は、実装方式によっては容易に迂回できます。上のURLでは、リクエストヘッダーにある<code>UserAgent</code>の値によって判定しています。</p>
 <p><strong>問題: curlのオプションを駆使し、上記のURLを閲覧してください。</strong></p>
 <div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
@@ -1185,7 +1185,7 @@ Accept: */*</code></pre>
 </div>
 <div id="callout-26" class="callout-26-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>iPad版Google ChromeのUserAgentは、Google検索するか生成AIから教えてもらえます。 今回は、適当に</p>
+<p>iPad版Google ChromeのUserAgentは、Google検索するか生成AIから教えてもらえます。今回は、適当に</p>
 <pre><code>Mozilla/5.0 (iPad; CPU OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/141.0 Mobile/15E148 Safari/605.1</code></pre>
 <p>としてみましょう。</p>
 </div>
@@ -1245,7 +1245,7 @@ Accept: */*</code></pre>
 </section>
 <section id="各要素への処理" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="各要素への処理">各要素への処理</h3>
-<p>JSON形式の各要素に対して何らかの処理を加えたいことがあります。 たとえば、</p>
+<p>JSON形式の各要素に対して何らかの処理を加えたいことがあります。たとえば、</p>
 <div class="sourceCode" id="cb69"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'.users[]'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>の中には年齢（<code>age</code>）フィールドがあります。この値をすべて変化させましょう。</p>
 <p><strong>問題: jqを駆使し、ユーザー全員の年齢を2倍にしてください。</strong></p>
@@ -1261,7 +1261,7 @@ Accept: */*</code></pre>
 </div>
 <div id="callout-28" class="callout-28-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>各要素に対して処理を行うフィルターには、<code>map</code>や<code>walk</code>があります。 <code>map</code>は配列の1階層のみ、<code>walk</code>は任意の要素を再帰的にたどります。 今回の用途では<code>map</code>で事足りるでしょう。</p>
+<p>各要素に対して処理を行うフィルターには、<code>map</code>や<code>walk</code>があります。<code>map</code>は配列の1階層のみ、<code>walk</code>は任意の要素を再帰的にたどります。今回の用途では<code>map</code>で事足りるでしょう。</p>
 <div class="sourceCode" id="cb70"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'[1,2,3,4]'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'map(. *2)'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb71"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="ot">,</span></span>
@@ -1319,7 +1319,7 @@ Accept: */*</code></pre>
 <h3 class="unnumbered anchored" data-anchor-id="グループ別集計">グループ別集計</h3>
 <p>JSON形式の特定の要素に着目して、集計をしたいことがあります。たとえば</p>
 <div class="sourceCode" id="cb75"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'.users[]'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>の中には血液型（<code>bloodGroup</code>）フィールドがあります。それぞれの血液型が 何名いるのでしょうか？</p>
+<p>の中には血液型（<code>bloodGroup</code>）フィールドがあります。それぞれの血液型が何名いるのでしょうか？</p>
 <p><strong>問題: jqを駆使し、血液型別の人数を求めてください。さらに 降順に並べてください。</strong></p>
 <div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
@@ -1333,7 +1333,7 @@ Accept: */*</code></pre>
 </div>
 <div id="callout-31" class="callout-31-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>配列から集計を行うためのフィルターに、<code>reduce</code>があります。 次のように使います。</p>
+<p>配列から集計を行うためのフィルターに、<code>reduce</code>があります。次のように使います。</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="ex">reduce</span> <span class="op">&lt;</span>入力配列<span class="op">&gt;</span> as <span class="va">$var</span> <span class="er">(</span><span class="ex">初期値</span><span class="kw">;</span> <span class="ex">式</span><span class="kw">)</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>入力配列: 集計したい配列</li>
@@ -1344,7 +1344,7 @@ Accept: */*</code></pre>
 <p>たとえば</p>
 <div class="sourceCode" id="cb77"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'[1,2,3,4,5]'</span> <span class="kw">|</span> <span class="ex">jq</span> <span class="st">'reduce .[] as $x (0; . + $x)'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb78"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="er">15</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>reduce</code>は<code>[1,2,3,4,5]</code>という配列の各要素を <code>$x</code>という一時変数に格納します。それらに対して加算していくので、 結果は<code>1+2+3+4+5</code>になります。</p>
+<p><code>reduce</code>は<code>[1,2,3,4,5]</code>という配列の各要素を<code>$x</code>という一時変数に格納します。それらに対して加算していくので、結果は<code>1+2+3+4+5</code>になります。</p>
 </div>
 </div>
 </div>
@@ -1360,17 +1360,17 @@ Accept: */*</code></pre>
 </div>
 <div id="callout-32" class="callout-32-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>キーごとに集計するためのjqの慣用句があります。次のコマンドは、 <code>name</code>フィールドごとに<code>score</code>の値を合計するためのものです。 <code>reduce</code>以下に着目してください。</p>
+<p>キーごとに集計するためのjqの慣用句があります。次のコマンドは、<code>name</code>フィールドごとに<code>score</code>の値を合計するためのものです。<code>reduce</code>以下に着目してください。</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'[{"name":"A","score":3},{"name":"B","score":5},{"name":"A","score":4}]'</span> <span class="kw">|</span></span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="ex">reduce</span> .[] as <span class="va">$p</span> <span class="er">(</span><span class="ex">{}</span><span class="kw">;</span> <span class="ex">.[</span><span class="va">$p</span><span class="ex">.name]</span> <span class="kw">|</span><span class="ex">=</span> <span class="er">(</span><span class="kw">(</span><span class="bu">.</span> // 0<span class="kw">)</span> <span class="ex">+</span> <span class="va">$p</span>.score<span class="kw">))</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li><code>//</code>は代替演算子で、<code>.</code>の値が<code>null</code>や<code>false</code>であれば<code>0</code>を返します。</li>
+<li><code>//</code>は代替演算子で、<code>.</code>の値が<code>null</code>や<code>false</code>であれば右辺（<code>0</code>）を返します。</li>
 </ul>
 <div class="sourceCode" id="cb80"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"A"</span><span class="fu">:</span> <span class="dv">7</span><span class="fu">,</span></span>
 <span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"B"</span><span class="fu">:</span> <span class="dv">5</span></span>
 <span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>処理をステップごとに見ていきます。</p>
+<p>処理をステップごとに見ていきましょう。</p>
 <ol type="1">
 <li>初期値<code>{}</code></li>
 <li>1人目<code>$p={"name":"A","score":3}</code>
@@ -1406,8 +1406,8 @@ Accept: */*</code></pre>
 </div>
 <div id="callout-34" class="callout-34-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>並び替えには<code>sort</code>を使いますが、<code>sort</code>はオブジェクトではなく 配列を入力値としてとります。 オブジェクトを配列にするためには<code>to_entries</code>、配列を オブジェクトにするためには<code>from_entries</code>を使います。</p>
-<p>以下では、3名分のオブジェクトの値を降順で ソートしています。</p>
+<p>並び替えには<code>sort</code>を使いますが、<code>sort</code>にわたるデータはオブジェクトではなく配列でなければいけません。オブジェクトを配列にするためには<code>to_entries</code>、配列をオブジェクトにするためには<code>from_entries</code>を使います。</p>
+<p>以下では、3名分のオブジェクトの値を降順でソートしています。</p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'{"Alice":7,"Bob":5,"Charlie":9}'</span> <span class="kw">|</span></span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jq</span> <span class="st">'</span></span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a><span class="st">  to_entries</span></span>
@@ -1448,7 +1448,7 @@ Accept: */*</code></pre>
 </div>
 <div id="callout-35" class="callout-35-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>以下のように、<code>reduce</code>と<code>to/from_entries</code>とを組み合わせて処理します。 それにしても、AB-とO-が第1位・第2位を占めていることから、これが 明らかにダミーデータであることが分かりますね。</p>
+<p>以下のように、<code>reduce</code>と<code>to/from_entries</code>とを組み合わせて処理します。それにしても、AB-とO-が第1位・第2位を占めていることから、これが明らかにダミーデータであることが分かりますね。</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">'https://dummyjson.com/users'</span> <span class="kw">|</span></span>
 <span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jq</span> <span class="st">'</span></span>
 <span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="st">  reduce .users[] as $u ({}; .[$u.bloodGroup] |= (. // 0) + 1) |</span></span>

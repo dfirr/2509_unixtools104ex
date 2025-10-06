@@ -54,7 +54,7 @@
     "href": "01-curl_jq.html#必要な準備",
     "title": "1  Web APIの処理（curl, jq）",
     "section": "1.2 必要な準備",
-    "text": "1.2 必要な準備\nPCでWSL（Windows Subsystem for Linux）が使えるようになっている必要があります。\nスタートメニューで「Ubuntu」とタイプし、表示されるUbuntuアプリを選択して、Ubuntuターミナルを表示させてください。",
+    "text": "1.2 必要な準備\nPCでWSL（Windows Subsystem for Linux）が使えるようになっている必要があります。\nスタートメニューで「terminal」とタイプし、表示されるターミナルアプリを選択して、Windowsターミナルを表示させてください。\n\n\n\n\n\nWindowsターミナルでは、デフォルトでWindows PowerShellが起動しています。「∨」マークをクリックし、表示されるメニューから「Ubuntu」を選択してください。",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Web APIの処理（curl, jq）</span>"
     ]

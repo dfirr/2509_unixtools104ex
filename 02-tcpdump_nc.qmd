@@ -1,0 +1,8 @@
+---
+date: 2025-10-01
+date-modified: last-modified
+---
+
+# パケットの観察（tcpdump, nc）
+## 目的
+この章の目的は、次の通りです。

@@ -16,10 +16,15 @@ date-modified: last-modified
 ## 必要な準備
 PCでWSL（Windows Subsystem for Linux）が使えるようになっている必要があります。
 
-スタートメニューで「Ubuntu」とタイプし、表示されるUbuntuアプリを選択して、
-Ubuntuターミナルを表示させてください。
+スタートメニューで「terminal」とタイプし、表示されるターミナルアプリを選択して、
+Windowsターミナルを表示させてください。
 
-![](images/ubuntu_app.png){fig-align="center" width=50%}
+![](images/start_terminal.png){fig-align="center" width=50%}
+
+Windowsターミナルでは、デフォルトでWindows PowerShellが起動しています。
+「∨」マークをクリックし、表示されるメニューから「Ubuntu」を選択してください。
+
+![](images/terminal_ubuntu.png){fig-align="center" width=50%}
 
 ## curl
 ### 単純な閲覧 {.unnumbered}
@@ -197,6 +202,8 @@ curl -sv 'http://abehiroshi.la.coocan.jp/test.html'
 
 ``` {.bash}
 curl -sf 'http://abehiroshi.la.coocan.jp/test.html'
+```
+``` {.bash}
 echo $?
 ```
 ``` {.bash .resultblock}
@@ -478,6 +485,8 @@ jqはUbuntu 24.0.3にプリインストールされていないので、`apt`コ
 
 ``` {.bash}
 sudo apt update
+```
+``` {.bash}
 sudo apt install -y jq
 ```
 

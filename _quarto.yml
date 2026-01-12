@@ -8,6 +8,8 @@ book:
   chapters:
     - index.qmd
     - 01-curl_jq.qmd
+    - 02-tcpdump_nc.qmd
+    - 03-nmap_hping.qmd
 
 # bibliography: references.bib
 
@@ -17,11 +19,25 @@ format:
   html:
     theme: cosmo
     css: styles.css
+    include-in-header:
+      - text: |
+          <link rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 filters:
+  - custom-callout
   - cjk_line_breaks_filter.lua
+
+custom-callout:
+  problem:
+    title: "問題"
+    icon: true
+    icon-symbol: "fa-pen-to-square"
+    color: "pink"
+    collapse: false
 
 engine: knitr
 
 execute:
   freeze: auto
+

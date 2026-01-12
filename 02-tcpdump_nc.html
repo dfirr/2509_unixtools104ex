@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; パケットの観察（tcpdump, nc） – Unix Tools 104 -- Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03-nmap_hping.html" rel="next">
+<link href="./01-curl_jq.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d881ae2b4b373d8927a62724336683a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "一致なし",
+    "search-matching-documents-text": "一致した文書",
+    "search-copy-link-title": "検索へのリンクをコピー",
+    "search-hide-matches-text": "追加の検索結果を非表示",
+    "search-more-match-text": "追加の検索結果",
+    "search-more-matches-text": "追加の検索結果",
+    "search-clear-button-title": "消去",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "検索",
+    "search-label": "サーチ"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+div.callout-problem.callout {
+  border-left-color: pink;
+}
+div.callout-problem.callout-style-default > .callout-header {
+  background-color: rgb(from pink r g b / 13%);
+}
+div.callout-problem .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-problem.callout-style-default .callout-icon::before, div.callout-problem.callout-titled .callout-icon::before {
+  font-family: 'Font Awesome 6 Free', FontAwesome;
+  font-style: normal;
+  content: '\f044' !important;
+  background-image: none;
+}
+</style>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="サイドバーを切り替える" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02-tcpdump_nc.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">パケットの観察（tcpdump, nc）</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="サイドバーを切り替える" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="サーチ" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Unix Tools 104 – Workbook</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="サーチ"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">はじめに</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-curl_jq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Web APIの処理（curl, jq）</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-tcpdump_nc.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">パケットの観察（tcpdump, nc）</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-nmap_hping.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">パケットの操作（nmap, hping）</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目次</h2>
+   
+  <ul>
+  <li><a href="#目的" id="toc-目的" class="nav-link active" data-scroll-target="#目的"><span class="header-section-number">2.1</span> 目的</a></li>
+  <li><a href="#必要な準備" id="toc-必要な準備" class="nav-link" data-scroll-target="#必要な準備"><span class="header-section-number">2.2</span> 必要な準備</a></li>
+  <li><a href="#tcpdump" id="toc-tcpdump" class="nav-link" data-scroll-target="#tcpdump"><span class="header-section-number">2.3</span> tcpdump</a>
+  <ul class="collapse">
+  <li><a href="#pingの観察" id="toc-pingの観察" class="nav-link" data-scroll-target="#pingの観察">pingの観察</a></li>
+  <li><a href="#digの観察" id="toc-digの観察" class="nav-link" data-scroll-target="#digの観察">digの観察</a></li>
+  <li><a href="#curlの観察" id="toc-curlの観察" class="nav-link" data-scroll-target="#curlの観察">curlの観察</a></li>
+  </ul></li>
+  <li><a href="#netcat" id="toc-netcat" class="nav-link" data-scroll-target="#netcat"><span class="header-section-number">2.4</span> netcat</a>
+  <ul class="collapse">
+  <li><a href="#wslで画面分割を行う" id="toc-wslで画面分割を行う" class="nav-link" data-scroll-target="#wslで画面分割を行う">WSLで画面分割を行う</a></li>
+  <li><a href="#自分のipアドレスを確認する" id="toc-自分のipアドレスを確認する" class="nav-link" data-scroll-target="#自分のipアドレスを確認する">自分のIPアドレスを確認する</a></li>
+  <li><a href="#tcpdump-1" id="toc-tcpdump-1" class="nav-link" data-scroll-target="#tcpdump-1">tcpdump</a></li>
+  <li><a href="#サーバーモード" id="toc-サーバーモード" class="nav-link" data-scroll-target="#サーバーモード">サーバーモード</a></li>
+  <li><a href="#クライアントモード" id="toc-クライアントモード" class="nav-link" data-scroll-target="#クライアントモード">クライアントモード</a></li>
+  </ul></li>
+  <li><a href="#追加課題" id="toc-追加課題" class="nav-link" data-scroll-target="#追加課題"><span class="header-section-number">2.5</span> 追加課題</a></li>
+  <li><a href="#参考資料" id="toc-参考資料" class="nav-link" data-scroll-target="#参考資料"><span class="header-section-number">2.6</span> 参考資料</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">パケットの観察（tcpdump, nc）</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">公開</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026年1月1日</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">更新日</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026年1月12日</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="目的" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="目的"><span class="header-section-number">2.1</span> 目的</h2>
+<p>この章の目的は、次の通りです。</p>
+</section>
+<section id="必要な準備" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="必要な準備"><span class="header-section-number">2.2</span> 必要な準備</h2>
+<p>PCでWSL（Windows Subsystem for Linux）が使えるようになっている必要があります。</p>
+<p><code>tcpdump</code>と<code>bind9-dnsutils</code>とをインストールしてください。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>パスワードを聞かれたときには、入力してください。（以後の<code>sudo</code>でも同様。）</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> tcpdump  bind9-dnsutils</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="tcpdump" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="tcpdump"><span class="header-section-number">2.3</span> tcpdump</h2>
+<section id="pingの観察" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="pingの観察">pingの観察</h3>
+<p>自分自身（localhost）に対してpingを実施し、そのパケットを取得します。Ubuntuのターミナルを開いてください。</p>
+<p>tcpdumpが認識するネットワークインターフェースを確認します。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tcpdump <span class="at">-D</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>1.eth0 [Up, Running, Connected]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>2.any (Pseudo-device that captures on all interfaces) [Up, Running]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>3.lo [Up, Running, Loopback]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>4.bluetooth-monitor (Bluetooth Linux Monitor) [Wireless]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>5.nflog (Linux netfilter log (NFLOG) interface) [none]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>6.nfqueue (Linux netfilter queue (NFQUEUE) interface) [none]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>7.dbus-system (D-Bus system bus) [none]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>8.dbus-session (D-Bus session bus) [none]</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>自分自身へのpingパケットを取得するので、<code>3.lo</code>のパケットを取得するのが適切です。（みなさんの環境では、番号は異なっている可能性があります。）</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tcpdump <span class="at">-n</span> <span class="at">-i</span> lo <span class="st">'icmp'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>-n</code>: 名前解決をしない。</li>
+<li><code>-i lo</code>: インターフェースに<code>lo</code>を指定（番号で指定するのも可）。</li>
+<li><code>'icmp'</code>: ICMPプロトコルのパケットのみ取得。</li>
+</ul>
+<p>次のように、tcpdumpが待ち受けになります。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tcpdump: verbose output suppressed, use -v[v]... for full protocol decode</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>このウインドウはそのままにしておき、別のウィンドウでUbuntuのターミナルを開きます。そして、自分自身にpingを実行します。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ping</span> <span class="at">-c</span> 2 127.0.0.2</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>-c 2</code> 2回実施する（指定しないとCtrl+Cで止めるまで続く）</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>PING 127.0.0.2 (127.0.0.2) 56(84) bytes of data.</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>64 bytes from 127.0.0.2: icmp_seq=1 ttl=64 time=0.236 ms</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>64 bytes from 127.0.0.2: icmp_seq=2 ttl=64 time=0.172 ms</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>--- 127.0.0.2 ping statistics ---</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>2 packets transmitted, 2 received, 0% packet loss, time 1021ms</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>rtt min/avg/max/mdev = 0.172/0.204/0.236/0.032 ms</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ノート
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>127.0.0.0/8</code>は、自分自身を意味するIPアドレス（ループバック）としてRFC 1122で予約されています。Linuxでは、<code>localhost</code>という名前が<code>127.0.0.1</code>に割り当てられています。（<code>/etc/hosts</code>を見て確認してください。）ここでは、<code>tcpdump</code>のrequest/replyの組が見分けやすくなるように、よく使われる<code>127.0.0.1</code>ではなく<code>127.0.0.2</code>を用いました。</p>
+</div>
+</div>
+<p>もう1度pingを自分自身に実行します。今度は3回にしてみます。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ping</span> <span class="at">-c</span> 3 127.0.0.2</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>PING 127.0.0.2 (127.0.0.2) 56(84) bytes of data.</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>64 bytes from 127.0.0.2: icmp_seq=1 ttl=64 time=0.159 ms</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>64 bytes from 127.0.0.2: icmp_seq=2 ttl=64 time=0.046 ms</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>64 bytes from 127.0.0.2: icmp_seq=3 ttl=64 time=0.066 ms</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>--- 127.0.0.2 ping statistics ---</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>3 packets transmitted, 3 received, 0% packet loss, time 2053ms</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>rtt min/avg/max/mdev = 0.046/0.090/0.159/0.049 ms</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>再びtcpdumpのウインドウに戻り、<code>Ctrl + C</code>キーを押してキャプチャーを中断します。</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ノート
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>Ctrl + C</code>は、<code>Ctrl</code>キーを押しっぱなしにしながら<code>C</code>キーを押すことを意味します。Windowsの「コピー」と同じ短縮キーです。</p>
+</div>
+</div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>$ sudo tcpdump -n -i lo 'icmp'</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tcpdump: verbose output suppressed, use -v[v]... for full protocol decode</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>11:00:12.353720 IP 127.0.0.1 &gt; 127.0.0.2: ICMP echo request, id 9601, seq 1, length 64</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>11:00:12.353750 IP 127.0.0.2 &gt; 127.0.0.1: ICMP echo reply, id 9601, seq 1, length 64</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>11:00:13.383826 IP 127.0.0.1 &gt; 127.0.0.2: ICMP echo request, id 9601, seq 2, length 64</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>11:00:13.383846 IP 127.0.0.2 &gt; 127.0.0.1: ICMP echo reply, id 9601, seq 2, length 64</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>11:01:29.608296 IP 127.0.0.1 &gt; 127.0.0.2: ICMP echo request, id 10752, seq 1, length 64</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>11:01:29.608312 IP 127.0.0.2 &gt; 127.0.0.1: ICMP echo reply, id 10752, seq 1, length 64</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>11:01:30.631788 IP 127.0.0.1 &gt; 127.0.0.2: ICMP echo request, id 10752, seq 2, length 64</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>11:01:30.631816 IP 127.0.0.2 &gt; 127.0.0.1: ICMP echo reply, id 10752, seq 2, length 64</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>11:01:31.655696 IP 127.0.0.1 &gt; 127.0.0.2: ICMP echo request, id 10752, seq 3, length 64</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>11:01:31.655723 IP 127.0.0.2 &gt; 127.0.0.1: ICMP echo reply, id 10752, seq 3, length 64</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>^C</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>10 packets captured</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>20 packets received by filter</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>0 packets dropped by kernel</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>pingの実行結果には、「56(84) bytes of data.」と書かれています。一方で、tcpdumpの取得結果には「length 64」と書かれています。なぜ20バイトの差が発生しているのでしょうか？</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><a href="https://www.infraexpert.com/study/tcpip1.html">IPヘッダー</a>および <a href="https://www.infraexpert.com/study/tcpip4.html">ICMPヘッダー</a>の構造を見比べてみましょう。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>pingとtcpdumpとでは、数えているバイト数の対象が異なります。pingの結果に出てきた56はICMPペイロードのバイト数、84はパケット全体のバイト数です。一方、tcpdumpの64はIPペイロードのバイト数を意味しています。つまり差分の20バイトは、IPv4ヘッダーの部分です。</p>
+</div>
+</div>
+</div>
+</section>
+<section id="digの観察" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="digの観察">digの観察</h3>
+<p>ICMPプロトコルに続いてUDPプロトコルを見ていきます。最もよく使われるUDPの1つはDNSでしょう。「<a href="http://abehiroshi.la.coocan.jp/">阿部寛のホームページ</a>」のFQDNを、<code>dig</code>コマンドを使って名前解決します。そのパケットを取得し、観察しましょう。</p>
+<p>Ubuntuのウインドウを2枚用意します。1枚目は<code>tcpdump</code>用、2枚目は<code>dig</code>用です。</p>
+<p>1枚目のウインドウで以下のコマンドを実行し、パケットを待ち受けます。</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tcpdump <span class="at">-n</span> <span class="at">-i</span> lo <span class="at">-t</span> <span class="st">'udp and (port 53)'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>-n</code>: 名前解決をしない。</li>
+<li><code>-i lo</code>: インターフェースに<code>lo</code>を指定（番号で指定するのも可）。</li>
+<li><code>-t</code>: 日時を表示しない（画面を節約し、結果に集中するため）。</li>
+<li><code>'udp and (port 53)'</code>: 発信元または宛先のポート番号が53番であるUDPパケットを取得。</li>
+</ul>
+<p>2枚目のウインドウに切り替え、名前解決をします。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short abehiroshi.la.coocan.jp</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>+short</code>: 表示を最小限にして結果だけを得る。</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash resultblock code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">222.158.205.72</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>阿部寛のホームページはIPv6にも対応しています。IPv6のアドレスも確認しておきましょう。</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short AAAA abehiroshi.la.coocan.jp</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>AAAA</code>: IPv6アドレスのレコードを問い合わせる。</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash resultblock code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">2001:258:8613:5000::101</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>また失敗例として、存在しないドメイン名も問い合わせておきます。</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short example.jp</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>1枚目のウインドウに戻って、<code>Ctrl+C</code>キーを押してパケット取得を停止し、結果を確認します。（一部の数字は実行時ごとに異なります。）</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>$ sudo tcpdump -n -i lo -t 'udp and (port 53)'</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>[sudo] password for swat:</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>tcpdump: verbose output suppressed, use -v[v]... for full protocol decode</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.46573 &gt; 10.255.255.254.53: 58814+ [1au] A? abehiroshi.la.coocan.jp. (64)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.53 &gt; 10.255.255.254.46573: 58814 1/0/1 A 222.158.205.72 (68)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.47038 &gt; 10.255.255.254.53: 36348+ [1au] AAAA? abehiroshi.la.coocan.jp. (64)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.53 &gt; 10.255.255.254.47038: 36348 1/0/1 AAAA 2001:258:8613:5000::101 (80)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.47662 &gt; 10.255.255.254.53: 58328+ [1au] A? example.jp. (51)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.53 &gt; 10.255.255.254.47662: 58328 NXDomain 0/1/1 (86)</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>tcpdump</code>は、DNSプロトコルを解釈した結果を表示しています。以下に簡単に解説しますが、詳しくは<a href="https://www.sbcr.jp/product/4815622657/">DNSに関する書籍</a>で学習してください。</p>
+<p>1行目は、UDP 53番ポート（53/udp）宛てなので、DNS問い合わせのパケットです。<code>10.255.255.254</code>というIPアドレスはWSLに特有のものです。このIPアドレスが、ホストOSとの仲介役になって名前解決を行っています。</p>
+<p><code>58814+</code>の<code>58814</code>は問い合わせIDを意味します。また、<code>+</code>は、再帰可能フラグがセットされていることを意味します。言い方を変えると、クライアントがサーバーに対して名前解決を完全に行ってほしいと伝えているのです。</p>
+<p><code>[1au]</code>は、追加フィールドが1つ存在することを意味します。ほとんどの場合、EDNS0という拡張プロトコルです。DNSはもともと512バイトを超えるメッセージがそのままでは扱えなかった（TCPにフォールバックしていた）ところ、IPv6やDNSSECの登場に伴って長いメッセージを取り扱う必要性が増したことからEDNS0が定められました。</p>
+<p><code>A? abehiroshi.la.coocan.jp.</code>は、<code>abehiroshi.la.coocan.jp</code>の<code>A</code>レコードを問い合わせていることを意味しています。</p>
+<p>2行目は、53/udpからのパケットなので、DNSサーバーからの応答です。<code>1/0/1</code>は、それぞれ「Answer / Authority / Additional」の数を意味しています。レコードが1つ返ってきたので1、それは権威情報を含んでいないので0、EDNS0の応答で1となっています。</p>
+<p>3行目と4行目とは、1行目・2行目のIPv6版です。5行目と6行目とは、存在しないドメインへの名前解決をしようとしたときの例です。</p>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>www.jcom.co.jp</code>をdigしたときの結果は、次の通りでした。</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash resultblock code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">www.jcom.co.jp.cdn.cloudflare.net.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">104.16.174.236</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">104.16.175.236</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>tcpdumpでパケットを取得したとき、「Answer / Authority / Additional」の組はどのようになると思いますか？　想像し、その後検証してください。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>次のように、「3/0/1」となります。</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.48428 &gt; 10.255.255.254.53: 13980+ [1au] A? www.jcom.co.jp. (55)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>IP 10.255.255.254.53 &gt; 10.255.255.254.48428: 13980 3/0/1 CNAME www.jcom.co.jp.cdn.cloudflare.net., A 104.16.175.236, A 104.16.174.236 (122)</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="curlの観察" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="curlの観察">curlの観察</h3>
+<p>続いて、TCPプロトコルとしてHTTPを取り上げます。</p>
+<p>Ubuntuのウインドウを2枚用意します。1枚目は<code>tcpdump</code>用、2枚目は<code>curl</code>用です。</p>
+<p>1枚目のウインドウで以下のコマンドを実行し、パケットを待ち受けます。これまではファイルを画面上に表示していましたが、今回は<code>curl.pcap</code>という名前でファイル出力することにします。</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tcpdump <span class="at">-i</span> any <span class="at">-w</span> curl.pcap <span class="st">'port 80'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>-i any</code>: 全インターフェースを対象（本来は特定の1つを指定すれば十分）。</li>
+<li><code>-w curl.pcap</code>: <code>curl.pcap</code>というファイル名で出力。</li>
+<li><code>'port 80'</code>: 発信元または宛先のポート番号が80番であるパケットを取得。</li>
+</ul>
+<p>2枚目のウインドウに切り替え、阿部寛のホームページを閲覧します。</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--ipv4</span> http://abehiroshi.la.coocan.jp/</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>--ipv4</code>: IPv4だけを使用する（出力結果をそろえるために指定）。</li>
+</ul>
+<p>1枚目のウインドウに戻り、<code>Ctrl+C</code>キーを押してパケット取得を停止させます。</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>^C12 packets captured</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>12 packets received by filter</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>0 packets dropped by kernel</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>そのまま、ファイルが存在するかどうかを確認します。</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> curl.pcap</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>-rw-r--r-- 1 tcpdump tcpdump 1957 Dec 30 13:11 curl.pcap</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+重要
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>もし<code>ls</code>の結果が</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode html resultblock code-with-copy"><code class="sourceCode html"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ls: cannot access 'curl.pcap': No such file or directory</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>であれば、のように表示されたら、パケットの取得に失敗しています。本節「curlの観察」の最初からやり直してください。</p>
+</div>
+</div>
+<p><code>tcpdump</code>の<code>-r</code>オプションを用いて、いま取得したパケットを読みます。環境によってIPアドレスやインターフェース名は変化しますので、完全に同一の結果にはなりません。</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-t</span> <span class="at">-r</span> curl.pcap</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>-n</code>: 名前解決をしない。</li>
+<li><code>-t</code>: 日時を表示しない（画面を節約し、結果に集中するため）。</li>
+<li><code>-r curl.pcap'</code>: <code>curl.pcap</code>を読み込む。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource html number-lines code-with-copy"><code class="sourceCode html"><span id="cb28-1"><a href="#cb28-1"></a>reading from file curl.pcap, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144</span>
+<span id="cb28-2"><a href="#cb28-2"></a>Warning: interface names might be incorrect</span>
+<span id="cb28-3"><a href="#cb28-3"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [S], seq 116484521, win 64440, options [mss 1432,sackOK,TS val 3242019354 ecr 0,nop,wscale 7], length 0</span>
+<span id="cb28-4"><a href="#cb28-4"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [S.], seq 1680624244, ack 116484522, win 14120, options [mss 1412,nop,wscale 0,sackOK,TS val 1836076075 ecr 3242019354], length 0</span>
+<span id="cb28-5"><a href="#cb28-5"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 1, win 504, options [nop,nop,TS val 3242019365 ecr 1836076075], length 0</span>
+<span id="cb28-6"><a href="#cb28-6"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [P.], seq 1:87, ack 1, win 504, options [nop,nop,TS val 3242019365 ecr 1836076075], length 86: HTTP: GET / HTTP/1.1</span>
+<span id="cb28-7"><a href="#cb28-7"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [.], ack 87, win 14206, options [nop,nop,TS val 1836076086 ecr 3242019365], length 0</span>
+<span id="cb28-8"><a href="#cb28-8"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [P.], seq 1:776, ack 87, win 14206, options [nop,nop,TS val 1836076090 ecr 3242019365], length 775: HTTP: HTTP/1.1 200 OK</span>
+<span id="cb28-9"><a href="#cb28-9"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 776, win 510, options [nop,nop,TS val 3242019380 ecr 1836076090], length 0</span>
+<span id="cb28-10"><a href="#cb28-10"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [F.], seq 87, ack 776, win 510, options [nop,nop,TS val 3242019381 ecr 1836076090], length 0</span>
+<span id="cb28-11"><a href="#cb28-11"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [.], ack 88, win 14206, options [nop,nop,TS val 1836076101 ecr 3242019381], length 0</span>
+<span id="cb28-12"><a href="#cb28-12"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [F.], seq 776, ack 88, win 14206, options [nop,nop,TS val 1836076101 ecr 3242019381], length 0</span>
+<span id="cb28-13"><a href="#cb28-13"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [F.], seq 776, ack 88, win 14206, options [nop,nop,TS val 1836077101 ecr 3242019381], length 0</span>
+<span id="cb28-14"><a href="#cb28-14"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 777, win 510, options [nop,nop,TS val 3242020392 ecr 1836077101], length 0</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>3行目から5行目において、TCPの3ウェイハンドシェイクを確立させています。Flagsフィールドが[S]-&gt;[S.]-&gt;[.]となっています。tcpdumpでは、ACKが<code>.</code>で表されます。</p>
+</section>
+</section>
+<section id="netcat" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="netcat"><span class="header-section-number">2.4</span> netcat</h2>
+<p>netcatは、Unixのネットワークソケットにバイナリ列を渡すだけのツールです。TCP/IP通信の観察がやりやすいですし、トラブルシューティングにも使えます。</p>
+<p>今回は、netcatのプロセスを2つ使って自分自身に対する通信を行い、そのようすをtcpdumpで観察します。</p>
+<p>その前に、2点準備をします。</p>
+<section id="wslで画面分割を行う" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="wslで画面分割を行う">WSLで画面分割を行う</h3>
+<p>リアルタイムで状況を観測したいのに、タブを切り替えるのは面倒です。WSLには、<a href="https://learn.microsoft.com/ja-jp/windows/terminal/panes">1つのタブの中で画面分割する機能</a>が備わっています。分割された1つ1つの枠をペイン（pane）と呼びます。</p>
+<p>左右（垂直軸）に分割する短縮キーは<code>Alt + Shift + +</code>、上下（水平軸）に分割する短縮キーは<code>Alt + Shift + -</code>です。</p>
+<p><code>Alt + Shift + -</code>を2回実行して、上下に画面を3分割してください。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/terminal_split3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>1番のペインから、tcpdump、nc（サーバーモード）、nc（クライアントモード）に利用します。</p>
+</section>
+<section id="自分のipアドレスを確認する" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="自分のipアドレスを確認する">自分のIPアドレスを確認する</h3>
+<p>以下のコマンドを使って、自分自身のIPアドレスを確認してください。</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> <span class="at">-4</span> <span class="at">-br</span> a <span class="kw">|</span> <span class="fu">grep</span> UP</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>-4</code>: IPv4アドレスのみ表示する</li>
+<li><code>-br</code>: 簡潔に表示する</li>
+<li><code>a</code>: IPアドレスを表示する（<code>addr</code>の略）</li>
+<li><code>| grep UP</code>: リンクアップしているものだけを抽出</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/terminal_ipbra.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>上記は私の自宅のPCでコマンドを実行した場合の例です。VPN接続を行っているときには、複数のIPアドレスが表示されます。どのIPアドレスを使っても構いません。私はeth3のIPアドレスを使うことにします。</p>
+</section>
+<section id="tcpdump-1" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="tcpdump-1">tcpdump</h3>
+<p>1番目のペインで次のコマンドを実行し、パケットを取得する準備に入ります。</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tcpdump <span class="at">-n</span> <span class="at">-i</span> lo <span class="st">'port 12345'</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="サーバーモード" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="サーバーモード">サーバーモード</h3>
+<p>2番目のペインで次のコマンドを実行し、netcatでTCP/IP接続を待ち受けます。</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nc</span> <span class="at">-l</span> <span class="at">-p</span> 12345</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="クライアントモード" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="クライアントモード">クライアントモード</h3>
+<p>3番目のペインで次のコマンドを実行し、先に確認したIPアドレスに接続します。</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nc</span> <span class="at">-l</span> IPアドレス 12345</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>IPアドレスが正しければ、1番目のペインで3ウェイハンドシェイクの確立が見られます。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/terminal_3way.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>2つのnetcatで通信が確立した状態で、それぞれのペインで文字（半角英数）を入力し、先方に伝わることを確かめてください。</p>
+<p>このとき、tcpdumpのseqやackの値の推移に着目し、その意味を考えましょう。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/terminal_hellogoodbye.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>上の画面は、クライアント側（最も下のペイン）で<code>hello</code>と入力し、そのあとサーバー側（真ん中のペイン）で<code>good-bye</code>と入力したときの状態です。</p>
+<p>tcpdumpの結果の1行目（17:16:37.180672）は、<code>seq 1:7</code>、<code>length 6</code>とあります。<code>length 6</code>なのは、<code>hello</code>の5バイトに改行文字（<code>0x0a</code>）が付与されているためです。そして<code>seq 1:7</code>は、1番目から6バイト送信し、先方からのACKの値が7になることを期待しているという意味です。</p>
+<p>そして2行目を見ると、たしかに<code>ack 7</code>となっているので、パケットが正常に到達していることがわかります。</p>
+<p>ただし、tcpdumpが表示するシーケンス番号は相対値です。絶対値で見たいときには<code>-S</code>オプションをつけてください。</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="追加課題" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="追加課題"><span class="header-section-number">2.5</span> 追加課題</h2>
+<p>GitHubから入手できるpcapファイルを調査します。以下のコマンドを使って、ファイルをダウンロードしてください。</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://raw.githubusercontent.com/markofu/pcaps/refs/heads/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>先頭のパケットが取得された日時（YYYY-MM-DD HH:NN:SS）をUTCで回答してください。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>-tttt</code>オプションを使うと、人間が読める形式になります。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="va">TZ</span><span class="op">=</span>UTC <span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-tttt</span> <span class="at">-r</span> ftp.pcap <span class="at">-c</span> 1</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>2006-12-16 17:24:40。tcpdumpはローカル時間で表示します。UTCで表示するには、最初に<code>TZ=UTC</code>を付加しておきます。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>このファイルに登場するIPv4アドレスを、すべて列挙してください。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>cut</code>コマンドを駆使して、必要なフィールドだけを切り抜きます。</p>
+<p>たとえば</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">2006-12-16</span> 17:24:43.167931 IP 192.168.0.193.7254 <span class="op">&gt;</span> 192.168.0.114.1140: </span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>から「<code>192.168.0.193</code>」の部分を抽出したければ、</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cut</span> <span class="at">-d</span> <span class="st">' '</span> <span class="at">-f</span> 4 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'.'</span> <span class="at">-f</span> 1-4</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>です。</p>
+<ul>
+<li><code>-d</code>: 区切り文字を指定。</li>
+<li><code>-f</code>: フィールド番号を指定。</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>sort</code>や<code>uniq</code>コマンドによって重複を排除します。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb37"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-tttt</span> <span class="at">-r</span> ftp.pcap <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">' '</span> <span class="at">-f</span> 4 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'.'</span> <span class="at">-f</span> 1-4 <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>を実行すると、送信元IPアドレスは</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.0.114</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.0.193</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="ex">63.245.209.21</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>の3つであることが分かります。宛先でも同様にすると</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-tttt</span> <span class="at">-r</span> ftp.pcap <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">' '</span> <span class="at">-f</span> 6 <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> <span class="st">'.'</span> <span class="at">-f</span> 1-4 <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">uniq</span></span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>同じ結果を得るので、上記の3つのIPアドレスがすべてです。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>FTPサーバーと思われるIPアドレスは何でしょうか？</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>FTPサーバーは、通常<code>21/tcp</code>で接続を待ち受けます。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-tttt</span> <span class="at">-r</span> ftp.pcap <span class="st">'dst port 21'</span> <span class="at">-c</span> 1</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>すると、<code>192.168.0.193</code>が21番ポートで接続を受け付けていることが分かります。よって、FTPサーバーは<code>192.168.0.193</code>です。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>FTPサーバーのユーザー名とパスワードは何ですか？</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>FTPサーバーの通信は暗号化されていません。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-tttt</span> <span class="at">-r</span> ftp.pcap <span class="st">'dst port 21'</span> <span class="at">-c</span> 1</span></code><button title="コピー" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>3本目に<code>USER</code>が、4本目に<code>PASS</code>が見えます。それぞれ、<code>csanders</code>と<code>echo</code>です。</p>
+</div>
+</div>
+</div>
+</section>
+<section id="参考資料" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="参考資料"><span class="header-section-number">2.6</span> 参考資料</h2>
+<ul>
+<li>Charles M. Kozierok「<a href="http://www.tcpipguide.com/">The TCP/IP Guide</a>」</li>
+<li>ネットワークエンジニアとして「<a href="https://www.infraexpert.com/study/tcpip.html">TCP/IP</a>」</li>
+<li>SEの道標「<a href="https://milestone-of-se.nesuke.com/nw-basic/ip/icmp/">ICMPとは</a>」</li>
+<li>SEの道標「<a href="https://milestone-of-se.nesuke.com/nw-basic/tcp-udp/tcp-udp-summary/">初心者にも分かるTCP/UDP</a>」</li>
+<li>SEの道標「<a href="https://milestone-of-se.nesuke.com/nw-basic/tcp-udp/tcp-connection/">TCPコネクションのシーケンスと状態確認</a>」</li>
+<li>The Tcpdump Group「<a href="https://www.tcpdump.org/">TCPDUMP and LIBPCAP</a>」</li>
+<li>杜甫々「<a href="https://www.tohoho-web.com/ex/tcpdump.html">とほほのtcpdump入門</a>」</li>
+<li>大角祐介「<a href="https://www.intellilink.co.jp/column/security/2015/070100.aspx">ネットワーク診断の現場から（netcat編・その1）</a>」</li>
+<li>大角祐介「<a href="https://www.intellilink.co.jp/column/security/2016/041300.aspx">ネットワーク診断の現場から（netcat編・その2）</a>」</li>
+<li>NETERSEC「<a href="https://www.netresec.com/?page=PcapFiles">Publicly available PCAP files</a>」</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "コピーしました");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "コピーしました");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01-curl_jq.html" class="pagination-link" aria-label="Web APIの処理（curl, jq）">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Web APIの処理（curl, jq）</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03-nmap_hping.html" class="pagination-link" aria-label="パケットの操作（nmap, hping）">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">パケットの操作（nmap, hping）</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

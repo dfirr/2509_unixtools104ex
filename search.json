@@ -110,6 +110,16 @@
     ]
   },
   {
+    "objectID": "02-tcpdump_nc.html#目的",
+    "href": "02-tcpdump_nc.html#目的",
+    "title": "2  パケットの観察（tcpdump, nc）",
+    "section": "",
+    "text": "tcpdumpを使ったパケットの取得・閲覧ができるようになること。\nnetcatの2つのモードが使えるようになること。\nTCP/IPを用いた通信手順の概要を理解すること。",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>パケットの観察（tcpdump, nc）</span>"
+    ]
+  },
+  {
     "objectID": "02-tcpdump_nc.html#必要な準備",
     "href": "02-tcpdump_nc.html#必要な準備",
     "title": "2  パケットの観察（tcpdump, nc）",

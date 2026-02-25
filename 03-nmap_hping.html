@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -33,14 +68,15 @@ ul.task-list li input[type="checkbox"] {
 <link href="./02-tcpdump_nc.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d881ae2b4b373d8927a62724336683a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-8f435a51bb9b73fbcd7541ac807dda06.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -111,7 +147,9 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Unix Tools 104 – Workbook</a> 
     </div>
@@ -152,8 +190,34 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目次</h2>
+   
+  <ul>
+  <li><a href="#目的" id="toc-目的" class="nav-link active" data-scroll-target="#目的"><span class="header-section-number">3.1</span> 目的</a></li>
+  <li><a href="#この章の注意事項" id="toc-この章の注意事項" class="nav-link" data-scroll-target="#この章の注意事項"><span class="header-section-number">3.2</span> この章の注意事項</a></li>
+  <li><a href="#事前準備git-docker" id="toc-事前準備git-docker" class="nav-link" data-scroll-target="#事前準備git-docker"><span class="header-section-number">3.3</span> 事前準備（git, Docker）</a></li>
+  <li><a href="#演習ファイルの取得" id="toc-演習ファイルの取得" class="nav-link" data-scroll-target="#演習ファイルの取得"><span class="header-section-number">3.4</span> 演習ファイルの取得</a></li>
+  <li><a href="#演習ラボの起動" id="toc-演習ラボの起動" class="nav-link" data-scroll-target="#演習ラボの起動"><span class="header-section-number">3.5</span> 演習ラボの起動</a></li>
+  <li><a href="#scannerで使えるコマンド確認" id="toc-scannerで使えるコマンド確認" class="nav-link" data-scroll-target="#scannerで使えるコマンド確認"><span class="header-section-number">3.6</span> scannerで使えるコマンド確認</a></li>
+  <li><a href="#nmapの基本" id="toc-nmapの基本" class="nav-link" data-scroll-target="#nmapの基本"><span class="header-section-number">3.7</span> nmapの基本</a></li>
+  <li><a href="#ホスト発見sweeping" id="toc-ホスト発見sweeping" class="nav-link" data-scroll-target="#ホスト発見sweeping"><span class="header-section-number">3.8</span> ホスト発見（sweeping）</a></li>
+  <li><a href="#ポートスキャン基礎" id="toc-ポートスキャン基礎" class="nav-link" data-scroll-target="#ポートスキャン基礎"><span class="header-section-number">3.9</span> ポートスキャン基礎</a></li>
+  <li><a href="#状態推定openclosedfiltered" id="toc-状態推定openclosedfiltered" class="nav-link" data-scroll-target="#状態推定openclosedfiltered"><span class="header-section-number">3.10</span> 状態推定（open/closed/filtered）</a></li>
+  <li><a href="#ackスキャン-sa" id="toc-ackスキャン-sa" class="nav-link" data-scroll-target="#ackスキャン-sa"><span class="header-section-number">3.11</span> ACKスキャン（-sA）</a></li>
+  <li><a href="#バージョン検出os推定" id="toc-バージョン検出os推定" class="nav-link" data-scroll-target="#バージョン検出os推定"><span class="header-section-number">3.12</span> バージョン検出・OS推定</a></li>
+  <li><a href="#nse入門script" id="toc-nse入門script" class="nav-link" data-scroll-target="#nse入門script"><span class="header-section-number">3.13</span> NSE入門（–script）</a></li>
+  <li><a href="#http系スクリプト演習" id="toc-http系スクリプト演習" class="nav-link" data-scroll-target="#http系スクリプト演習"><span class="header-section-number">3.14</span> HTTP系スクリプト演習</a></li>
+  <li><a href="#演習admin.htmlを見つける" id="toc-演習admin.htmlを見つける" class="nav-link" data-scroll-target="#演習admin.htmlを見つける"><span class="header-section-number">3.15</span> 演習：admin.htmlを見つける</a></li>
+  <li><a href="#tcpdump併用でスキャンを裏付ける" id="toc-tcpdump併用でスキャンを裏付ける" class="nav-link" data-scroll-target="#tcpdump併用でスキャンを裏付ける"><span class="header-section-number">3.16</span> tcpdump併用でスキャンを裏付ける</a></li>
+  <li><a href="#hping3入門" id="toc-hping3入門" class="nav-link" data-scroll-target="#hping3入門"><span class="header-section-number">3.17</span> hping3入門</a></li>
+  <li><a href="#hping3演習synackフラグ操作" id="toc-hping3演習synackフラグ操作" class="nav-link" data-scroll-target="#hping3演習synackフラグ操作"><span class="header-section-number">3.18</span> hping3演習（SYN/ACK/フラグ操作）</a></li>
+  <li><a href="#追加課題" id="toc-追加課題" class="nav-link" data-scroll-target="#追加課題"><span class="header-section-number">3.19</span> 追加課題</a></li>
+  <li><a href="#まとめ" id="toc-まとめ" class="nav-link" data-scroll-target="#まとめ"><span class="header-section-number">3.20</span> まとめ</a></li>
+  <li><a href="#参考資料" id="toc-参考資料" class="nav-link" data-scroll-target="#参考資料"><span class="header-section-number">3.21</span> 参考資料</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -171,14 +235,14 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
     <div>
     <div class="quarto-title-meta-heading">公開</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">2026年1月1日</p>
+      <p class="date">2026年1月20日</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">更新日</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2025年12月31日</p>
+      <p class="date-modified">2026年2月25日</p>
     </div>
   </div>
     
@@ -189,8 +253,345 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 </header>
 
 
+<section id="目的" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="目的"><span class="header-section-number">3.1</span> 目的</h2>
+<p>この章の目的は、次の通りです。</p>
+<ul>
+<li>nmapによる自動化されたスキャンの基本が理解できるようになること。</li>
+<li>nmapのscript機能を使って、対象ホストの追加情報を得られるようになること。</li>
+<li>hping3を使って、より低いレベルでパケットを操作できるようになること。</li>
+</ul>
+</section>
+<section id="この章の注意事項" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="この章の注意事項"><span class="header-section-number">3.2</span> この章の注意事項</h2>
+<p>この章では、<strong>インターネット上のホストに対してスキャンしません</strong>。演習はすべてDockerの閉域ネットワーク内で実施します。</p>
+<p>組織内ネットワークやインターネットに対する無断スキャンは、セキュリティ事故や規約違反につながるおそれがあります。必ず、講義用に準備された環境のみを対象にしてください。</p>
+</section>
+<section id="事前準備git-docker" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="事前準備git-docker"><span class="header-section-number">3.3</span> 事前準備（git, Docker）</h2>
+<p>この章は、WSL上のUbuntuを前提に進めます。まず、<code>git</code>とDocker関連ツールをインストールします。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> git docker.io docker-compose-v2</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dockerを<code>sudo</code>なしで使えるように、ユーザーを<code>docker</code>グループに追加します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> usermod <span class="at">-aG</span> docker <span class="va">$USER</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>この変更は、ログインし直すと反映されます。WSLターミナルを閉じて開き直すか、次のコマンドで現在のシェルに反映してください。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">newgrp</span> docker</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>以下で動作確認します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> <span class="at">--version</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose version</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="演習ファイルの取得" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="演習ファイルの取得"><span class="header-section-number">3.4</span> 演習ファイルの取得</h2>
+<p>GitHubから演習ファイルを取得します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/cases</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/cases</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/dfirr/2509_unixtools104ex.git</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 2509_unixtools104ex/ch3-lab</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="演習ラボの起動" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="演習ラボの起動"><span class="header-section-number">3.5</span> 演習ラボの起動</h2>
+<p>次のコマンドで演習環境を起動します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span> <span class="at">--build</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>起動するコンテナは以下の3つです。</p>
+<ul>
+<li><code>ch3-scanner</code>: <code>nmap</code>, <code>hping3</code>, <code>tcpdump</code>, <code>nc</code>, <code>curl</code>を実行する側</li>
+<li><code>ch3-target-web</code>: <code>80/tcp</code>を待ち受けるWebサーバー側</li>
+<li><code>ch3-target-closed</code>: 待ち受けポートを持たない側</li>
+</ul>
+<p>正常に起動できたかを確認します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose ps</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="scannerで使えるコマンド確認" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="scannerで使えるコマンド確認"><span class="header-section-number">3.6</span> scannerで使えるコマンド確認</h2>
+<p><code>scanner</code>コンテナに入り、この章で使うコマンドを確認します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> exec <span class="at">-it</span> ch3-scanner bash</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> nmap hping3 tcpdump nc curl</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>確認できたら、以後のコマンドは<code>scanner</code>コンテナ内で実行します。</p>
+</section>
+<section id="nmapの基本" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="nmapの基本"><span class="header-section-number">3.7</span> nmapの基本</h2>
+<p>nmapは、ネットワーク探索とポートスキャンを行うためのツールです。基本的な書式は次の通りです。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="pp">[</span><span class="ss">オプション</span><span class="pp">]</span> 対象</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>まずは<code>target-web</code>に対して、最小限のスキャンを実行します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>出力では、次の列に注目してください。</p>
+<ul>
+<li><code>PORT</code>: ポート番号とプロトコル</li>
+<li><code>STATE</code>: ポート状態（open/closed/filtered）</li>
+<li><code>SERVICE</code>: 推定されたサービス名</li>
+</ul>
+</section>
+<section id="ホスト発見sweeping" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="ホスト発見sweeping"><span class="header-section-number">3.8</span> ホスト発見（sweeping）</h2>
+<p><code>-sn</code>オプションを使うと、ポートスキャンを行わず、ホストが応答するかどうかを確認します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sn</span> target-web target-closed</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>同一セグメント内をまとめて探索するときには、CIDR表記を使います。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sn</span> 172.21.0.0/24</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ノート
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>ここでいう<code>sweeping</code>は、アドレス範囲を走査して「どのホストが生きているか」を確認する手法です。実運用環境では必ず許可を得た範囲だけで実施してください。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Problem</span>問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>nmap -sn 172.21.0.0/24</code>の結果から、応答したホスト数を確認してください。<code>target-web</code>と<code>target-closed</code>は見つかるでしょうか？</p>
+</div>
+</div>
+</section>
+<section id="ポートスキャン基礎" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="ポートスキャン基礎"><span class="header-section-number">3.9</span> ポートスキャン基礎</h2>
+<p><code>-p</code>で対象ポートを指定します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>-sT</code>はTCP connect scanです。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sT</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>-sS</code>はSYN scanです（通常は管理者権限が必要）。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sS</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>-Pn</code>を使うと、事前のホスト発見を省略してスキャンします。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-Pn</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ノート
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>-sT</code>はOSの通常ソケットAPIを使って接続を試みます。一方、<code>-sS</code>はSYNパケットを直接使った半開接続（half-open）の手法で、より低い層の制御を行います。</p>
+</div>
+</div>
+</section>
+<section id="状態推定openclosedfiltered" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="状態推定openclosedfiltered"><span class="header-section-number">3.10</span> 状態推定（open/closed/filtered）</h2>
+<p>nmapの出力では、ポート状態として<code>open</code>, <code>closed</code>, <code>filtered</code>が表示されます。<code>target-web</code>と<code>target-closed</code>を比較し、結果の違いを確認してください。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-p</span> 80,443 target-web target-closed</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>大まかな意味は次の通りです。</p>
+<ul>
+<li><code>open</code>: 対象ポートで待受しているプロセスがある</li>
+<li><code>closed</code>: 対象ホストには到達できるが、待受はない</li>
+<li><code>filtered</code>: フィルタリング等により状態判定が難しい</li>
+</ul>
+</section>
+<section id="ackスキャン-sa" class="level2" data-number="3.11">
+<h2 data-number="3.11" class="anchored" data-anchor-id="ackスキャン-sa"><span class="header-section-number">3.11</span> ACKスキャン（-sA）</h2>
+<p><code>-sA</code>はACKパケットを使って、フィルタリングの有無を推定する手法です。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sA</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>結果に<code>unfiltered</code>や<code>filtered</code>が出たとき、それが何を意味するかを考えましょう。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sA</span> <span class="at">-p</span> 80 target-closed</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled" title="観察のポイント">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">ヒント</span>観察のポイント
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>-sS</code>と<code>-sA</code>とでは、得られる情報の種類が異なります。<code>-sS</code>はポート開閉の推定に、<code>-sA</code>はフィルタの有無の推定に向いています。</p>
+</div>
+</div>
+</section>
+<section id="バージョン検出os推定" class="level2" data-number="3.12">
+<h2 data-number="3.12" class="anchored" data-anchor-id="バージョン検出os推定"><span class="header-section-number">3.12</span> バージョン検出・OS推定</h2>
+<p><code>-sV</code>でサービスバージョン検出を行います。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sV</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>-O</code>はOS推定です。コンテナ環境では精度に限界があるため、推定結果が不正確になる場合があります。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-O</span> target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="nse入門script" class="level2" data-number="3.13">
+<h2 data-number="3.13" class="anchored" data-anchor-id="nse入門script"><span class="header-section-number">3.13</span> NSE入門（–script）</h2>
+<p>nmapにはNSE（Nmap Scripting Engine）があり、用途別のスクリプトを実行できます。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">--script-help</span> default</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>--script</code>でカテゴリや個別スクリプトを指定します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-p</span> 80 <span class="at">--script</span> default target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>HTTP関連スクリプトの例を確認してみます。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> /usr/share/nmap/scripts/http-<span class="pp">*</span> <span class="kw">|</span> <span class="fu">head</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="http系スクリプト演習" class="level2" data-number="3.14">
+<h2 data-number="3.14" class="anchored" data-anchor-id="http系スクリプト演習"><span class="header-section-number">3.14</span> HTTP系スクリプト演習</h2>
+<p>HTTP系スクリプトを使って、Webサーバーの情報を収集します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-p</span> 80 <span class="at">--script</span> http-title,http-headers,http-server-header target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p>さらに<code>http-enum</code>で、公開されているパスを探索します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-p</span> 80 <span class="at">--script</span> http-enum target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ノート
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>http-enum</code>は、よく使われるパス候補に対してHTTPリクエストを送り、応答コードなどから存在を推定します。</p>
+</div>
+</div>
+</section>
+<section id="演習admin.htmlを見つける" class="level2" data-number="3.15">
+<h2 data-number="3.15" class="anchored" data-anchor-id="演習admin.htmlを見つける"><span class="header-section-number">3.15</span> 演習：admin.htmlを見つける</h2>
+<p><code>http-enum</code>で検出された候補を、<code>curl</code>で実際に確認します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://target-web/admin.html</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Problem</span>問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>/admin.html</code>は、<code>target-web</code>のトップページからリンクされているでしょうか。また、攻撃者がこのページを発見できる理由を説明してください。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="ヒント">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">ヒント</span>ヒント
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>curl -i http://target-web/robots.txt</code> を実行してみてください。</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="解答">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">ヒント</span>解答
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>リンクが無くても、推測しやすいURLや列挙スクリプトの辞書探索により発見される可能性があります。<code>robots.txt</code>の記述も手がかりになります。</p>
+</div>
+</div>
+</div>
+</section>
+<section id="tcpdump併用でスキャンを裏付ける" class="level2" data-number="3.16">
+<h2 data-number="3.16" class="anchored" data-anchor-id="tcpdump併用でスキャンを裏付ける"><span class="header-section-number">3.16</span> tcpdump併用でスキャンを裏付ける</h2>
+<p>nmapの結果を「文字列」だけで終わらせず、パケットとして確認します。1つのターミナルでtcpdump、もう1つでnmapを実行してください。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-i</span> eth0 <span class="st">'host target-web and tcp port 80'</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-sS</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ノート
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>-sS</code>では、SYN -&gt; SYN/ACK（またはRST）という往復に注目してください。Ch.2で学んだ内容と接続すると理解しやすくなります。</p>
+</div>
+</div>
+</section>
+<section id="hping3入門" class="level2" data-number="3.17">
+<h2 data-number="3.17" class="anchored" data-anchor-id="hping3入門"><span class="header-section-number">3.17</span> hping3入門</h2>
+<p>hping3は、任意のフラグを付けたTCPパケットなどを手動で送信できるツールです。nmapより低レベルの実験ができます。</p>
+<p>まずはSYNパケットを送信します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hping3</span> <span class="at">-S</span> <span class="at">-p</span> 80 <span class="at">-c</span> 3 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>-S</code>はSYNフラグ、<code>-p</code>は宛先ポート、<code>-c</code>は送信回数です。</p>
+</section>
+<section id="hping3演習synackフラグ操作" class="level2" data-number="3.18">
+<h2 data-number="3.18" class="anchored" data-anchor-id="hping3演習synackフラグ操作"><span class="header-section-number">3.18</span> hping3演習（SYN/ACK/フラグ操作）</h2>
+<p>SYN以外のフラグでも挙動を確認します。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hping3</span> <span class="at">-A</span> <span class="at">-p</span> 80 <span class="at">-c</span> 3 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hping3</span> <span class="at">-F</span> <span class="at">-p</span> 80 <span class="at">-c</span> 3 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-problem callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Problem</span>問題
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>-S</code>と<code>-A</code>と<code>-F</code>とで、応答の傾向はどのように変わるでしょうか。tcpdumpと併用して観察し、理由を説明してください。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="観察の補助">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">ヒント</span>観察の補助
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>別ターミナルで次を実行し、フラグの違いを確認してください。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">tcpdump</span> <span class="at">-n</span> <span class="at">-i</span> eth0 <span class="st">'host target-web and tcp'</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</section>
+<section id="追加課題" class="level2" data-number="3.19">
+<h2 data-number="3.19" class="anchored" data-anchor-id="追加課題"><span class="header-section-number">3.19</span> 追加課題</h2>
+<p>次の2つの立場で、同じ対象を調査してください。</p>
+<ul>
+<li>立場A: nmap中心（自動化重視）</li>
+<li>立場B: hping3中心（手動制御重視）</li>
+</ul>
+<p>それぞれについて、次の観点で比較しなさい。</p>
+<ul>
+<li>実行の速さ</li>
+<li>得られる情報の量</li>
+<li>手順の再現性</li>
+<li>誤操作リスク</li>
+</ul>
+</section>
+<section id="まとめ" class="level2" data-number="3.20">
+<h2 data-number="3.20" class="anchored" data-anchor-id="まとめ"><span class="header-section-number">3.20</span> まとめ</h2>
+<p>この章では、次の3点を学習しました。</p>
+<ul>
+<li>nmapで対象のホスト・ポート・サービスを効率的に調査する方法</li>
+<li>NSE（<code>--script</code>）で追加情報を得る方法</li>
+<li>hping3でTCPフラグを操作し、応答を観察する方法</li>
+</ul>
+</section>
+<section id="参考資料" class="level2" data-number="3.21">
+<h2 data-number="3.21" class="anchored" data-anchor-id="参考資料"><span class="header-section-number">3.21</span> 参考資料</h2>
+<ul>
+<li>Nmap「<a href="https://nmap.org/book/man.html">Nmap Reference Guide</a>」</li>
+<li>Nmap「<a href="https://nmap.org/book/nse.html">Nmap Scripting Engine Documentation</a>」</li>
+<li>hping「<a href="https://linux.die.net/man/8/hping3">hping3 man page</a>」</li>
+</ul>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -244,13 +645,14 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

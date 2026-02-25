@@ -1,0 +1,32 @@
+services:
+  scanner:
+    build:
+      context: ./scanner
+    container_name: ch3-scanner
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    tty: true
+    stdin_open: true
+    command: sleep infinity
+    networks:
+      - labnet
+
+  target-web:
+    build:
+      context: ./target-web
+    container_name: ch3-target-web
+    networks:
+      - labnet
+
+  target-closed:
+    image: alpine:3.20
+    container_name: ch3-target-closed
+    command: sleep infinity
+    networks:
+      - labnet
+
+networks:
+  labnet:
+    name: ch3-labnet
+    internal: true

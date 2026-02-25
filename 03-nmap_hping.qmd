@@ -1,7 +1,348 @@
 ---
-date: 2026-01-01
+date: 2026-01-20
 date-modified: last-modified
+engine: knitr
 ---
 
 # パケットの操作（nmap, hping）
 
+## 目的
+この章の目的は、次の通りです。
+
+- nmapによる自動化されたスキャンの基本が理解できるようになること。
+- nmapのscript機能を使って、対象ホストの追加情報を得られるようになること。
+- hping3を使って、より低いレベルでパケットを操作できるようになること。
+
+## この章の注意事項
+この章では、**インターネット上のホストに対してスキャンしません**。
+演習はすべてDockerの閉域ネットワーク内で実施します。
+
+組織内ネットワークやインターネットに対する無断スキャンは、
+セキュリティ事故や規約違反につながるおそれがあります。
+必ず、講義用に準備された環境のみを対象にしてください。
+
+## 事前準備（git, Docker）
+この章は、WSL上のUbuntuを前提に進めます。
+まず、`git`とDocker関連ツールをインストールします。
+
+``` {.bash}
+sudo apt update
+sudo apt install -y git docker.io docker-compose-v2
+```
+
+Dockerを`sudo`なしで使えるように、ユーザーを`docker`グループに追加します。
+
+``` {.bash}
+sudo usermod -aG docker $USER
+```
+
+この変更は、ログインし直すと反映されます。WSLターミナルを閉じて開き直すか、
+次のコマンドで現在のシェルに反映してください。
+
+``` {.bash}
+newgrp docker
+```
+
+以下で動作確認します。
+
+``` {.bash}
+git --version
+docker --version
+docker compose version
+```
+
+## 演習ファイルの取得
+GitHubから演習ファイルを取得します。
+
+``` {.bash}
+mkdir -p ~/cases
+cd ~/cases
+git clone https://github.com/dfirr/2509_unixtools104ex.git
+cd 2509_unixtools104ex/ch3-lab
+```
+
+## 演習ラボの起動
+次のコマンドで演習環境を起動します。
+
+``` {.bash}
+docker compose up -d --build
+```
+
+起動するコンテナは以下の3つです。
+
+- `ch3-scanner`: `nmap`, `hping3`, `tcpdump`, `nc`, `curl`を実行する側
+- `ch3-target-web`: `80/tcp`を待ち受けるWebサーバー側
+- `ch3-target-closed`: 待ち受けポートを持たない側
+
+正常に起動できたかを確認します。
+
+``` {.bash}
+docker compose ps
+```
+
+## scannerで使えるコマンド確認
+`scanner`コンテナに入り、この章で使うコマンドを確認します。
+
+``` {.bash}
+docker exec -it ch3-scanner bash
+```
+
+``` {.bash}
+which nmap hping3 tcpdump nc curl
+```
+
+確認できたら、以後のコマンドは`scanner`コンテナ内で実行します。
+
+## nmapの基本
+nmapは、ネットワーク探索とポートスキャンを行うためのツールです。
+基本的な書式は次の通りです。
+
+``` {.bash}
+nmap [オプション] 対象
+```
+
+まずは`target-web`に対して、最小限のスキャンを実行します。
+
+``` {.bash}
+nmap target-web
+```
+
+出力では、次の列に注目してください。
+
+- `PORT`: ポート番号とプロトコル
+- `STATE`: ポート状態（open/closed/filtered）
+- `SERVICE`: 推定されたサービス名
+
+## ホスト発見（sweeping）
+`-sn`オプションを使うと、ポートスキャンを行わず、ホストが応答するかどうかを確認します。
+
+``` {.bash}
+nmap -sn target-web target-closed
+```
+
+同一セグメント内をまとめて探索するときには、CIDR表記を使います。
+
+``` {.bash}
+nmap -sn 172.21.0.0/24
+```
+
+::: {.callout-note}
+ここでいう`sweeping`は、アドレス範囲を走査して「どのホストが生きているか」を
+確認する手法です。実運用環境では必ず許可を得た範囲だけで実施してください。
+:::
+
+::: problem
+`nmap -sn 172.21.0.0/24`の結果から、応答したホスト数を確認してください。
+`target-web`と`target-closed`は見つかるでしょうか？
+:::
+
+## ポートスキャン基礎
+`-p`で対象ポートを指定します。
+
+``` {.bash}
+nmap -p 80 target-web
+```
+
+`-sT`はTCP connect scanです。
+
+``` {.bash}
+nmap -sT -p 80 target-web
+```
+
+`-sS`はSYN scanです（通常は管理者権限が必要）。
+
+``` {.bash}
+nmap -sS -p 80 target-web
+```
+
+`-Pn`を使うと、事前のホスト発見を省略してスキャンします。
+
+``` {.bash}
+nmap -Pn -p 80 target-web
+```
+
+::: {.callout-note}
+`-sT`はOSの通常ソケットAPIを使って接続を試みます。一方、`-sS`はSYNパケットを
+直接使った半開接続（half-open）の手法で、より低い層の制御を行います。
+:::
+
+## 状態推定（open/closed/filtered）
+nmapの出力では、ポート状態として`open`, `closed`, `filtered`が表示されます。
+`target-web`と`target-closed`を比較し、結果の違いを確認してください。
+
+``` {.bash}
+nmap -p 80,443 target-web target-closed
+```
+
+大まかな意味は次の通りです。
+
+- `open`: 対象ポートで待受しているプロセスがある
+- `closed`: 対象ホストには到達できるが、待受はない
+- `filtered`: フィルタリング等により状態判定が難しい
+
+## ACKスキャン（-sA）
+`-sA`はACKパケットを使って、フィルタリングの有無を推定する手法です。
+
+``` {.bash}
+nmap -sA -p 80 target-web
+```
+
+結果に`unfiltered`や`filtered`が出たとき、それが何を意味するかを考えましょう。
+
+``` {.bash}
+nmap -sA -p 80 target-closed
+```
+
+::: {.callout-tip title="観察のポイント"}
+`-sS`と`-sA`とでは、得られる情報の種類が異なります。`-sS`はポート開閉の推定に、
+`-sA`はフィルタの有無の推定に向いています。
+:::
+
+## バージョン検出・OS推定
+`-sV`でサービスバージョン検出を行います。
+
+``` {.bash}
+nmap -sV -p 80 target-web
+```
+
+`-O`はOS推定です。コンテナ環境では精度に限界があるため、
+推定結果が不正確になる場合があります。
+
+``` {.bash}
+nmap -O target-web
+```
+
+## NSE入門（--script）
+nmapにはNSE（Nmap Scripting Engine）があり、用途別のスクリプトを実行できます。
+
+``` {.bash}
+nmap --script-help default
+```
+
+`--script`でカテゴリや個別スクリプトを指定します。
+
+``` {.bash}
+nmap -p 80 --script default target-web
+```
+
+HTTP関連スクリプトの例を確認してみます。
+
+``` {.bash}
+ls /usr/share/nmap/scripts/http-* | head
+```
+
+## HTTP系スクリプト演習
+HTTP系スクリプトを使って、Webサーバーの情報を収集します。
+
+``` {.bash}
+nmap -p 80 --script http-title,http-headers,http-server-header target-web
+```
+
+さらに`http-enum`で、公開されているパスを探索します。
+
+``` {.bash}
+nmap -p 80 --script http-enum target-web
+```
+
+::: {.callout-note}
+`http-enum`は、よく使われるパス候補に対してHTTPリクエストを送り、
+応答コードなどから存在を推定します。
+:::
+
+## 演習：admin.htmlを見つける
+`http-enum`で検出された候補を、`curl`で実際に確認します。
+
+``` {.bash}
+curl -i http://target-web/admin.html
+```
+
+::: problem
+`/admin.html`は、`target-web`のトップページからリンクされているでしょうか。
+また、攻撃者がこのページを発見できる理由を説明してください。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+`curl -i http://target-web/robots.txt` を実行してみてください。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+リンクが無くても、推測しやすいURLや列挙スクリプトの辞書探索により
+発見される可能性があります。`robots.txt`の記述も手がかりになります。
+:::
+
+## tcpdump併用でスキャンを裏付ける
+nmapの結果を「文字列」だけで終わらせず、パケットとして確認します。
+1つのターミナルでtcpdump、もう1つでnmapを実行してください。
+
+``` {.bash}
+tcpdump -n -i eth0 'host target-web and tcp port 80'
+```
+
+``` {.bash}
+nmap -sS -p 80 target-web
+```
+
+::: {.callout-note}
+`-sS`では、SYN -> SYN/ACK（またはRST）という往復に注目してください。
+Ch.2で学んだ内容と接続すると理解しやすくなります。
+:::
+
+## hping3入門
+hping3は、任意のフラグを付けたTCPパケットなどを手動で送信できるツールです。
+nmapより低レベルの実験ができます。
+
+まずはSYNパケットを送信します。
+
+``` {.bash}
+hping3 -S -p 80 -c 3 target-web
+```
+
+`-S`はSYNフラグ、`-p`は宛先ポート、`-c`は送信回数です。
+
+## hping3演習（SYN/ACK/フラグ操作）
+SYN以外のフラグでも挙動を確認します。
+
+``` {.bash}
+hping3 -A -p 80 -c 3 target-web
+```
+
+``` {.bash}
+hping3 -F -p 80 -c 3 target-web
+```
+
+::: problem
+`-S`と`-A`と`-F`とで、応答の傾向はどのように変わるでしょうか。
+tcpdumpと併用して観察し、理由を説明してください。
+:::
+
+::: {.callout-tip title="観察の補助" collapse="true"}
+別ターミナルで次を実行し、フラグの違いを確認してください。
+``` {.bash}
+tcpdump -n -i eth0 'host target-web and tcp'
+```
+:::
+
+## 追加課題
+次の2つの立場で、同じ対象を調査してください。
+
+- 立場A: nmap中心（自動化重視）
+- 立場B: hping3中心（手動制御重視）
+
+それぞれについて、次の観点で比較しなさい。
+
+- 実行の速さ
+- 得られる情報の量
+- 手順の再現性
+- 誤操作リスク
+
+## まとめ
+この章では、次の3点を学習しました。
+
+- nmapで対象のホスト・ポート・サービスを効率的に調査する方法
+- NSE（`--script`）で追加情報を得る方法
+- hping3でTCPフラグを操作し、応答を観察する方法
+
+## 参考資料
+- Nmap「[Nmap Reference Guide](https://nmap.org/book/man.html)」
+- Nmap「[Nmap Scripting Engine Documentation](https://nmap.org/book/nse.html)」
+- hping「[hping3 man page](https://linux.die.net/man/8/hping3)」

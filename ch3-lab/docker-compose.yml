@@ -10,23 +10,29 @@ services:
     stdin_open: true
     command: sleep infinity
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 10.250.250.10
 
   target-web:
     build:
       context: ./target-web
     container_name: ch3-target-web
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 10.250.250.20
 
   target-closed:
     image: alpine:3.20
     container_name: ch3-target-closed
     command: sleep infinity
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 10.250.250.30
 
 networks:
   labnet:
     name: ch3-labnet
     internal: true
+    ipam:
+      config:
+        - subnet: 10.250.250.0/24

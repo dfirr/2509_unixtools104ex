@@ -240,7 +240,7 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
     <div>
     <div class="quarto-title-meta-heading">更新日</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026年1月16日</p>
+      <p class="date-modified">2026年3月1日</p>
     </div>
   </div>
     
@@ -532,22 +532,23 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 <li><code>-t</code>: 日時を表示しない（画面を節約し、結果に集中するため）。</li>
 <li><code>-r curl.pcap'</code>: <code>curl.pcap</code>を読み込む。</li>
 </ul>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource html number-lines code-with-copy"><code class="sourceCode html"><span id="cb28-1"><a href="#cb28-1"></a>reading from file curl.pcap, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144</span>
-<span id="cb28-2"><a href="#cb28-2"></a>Warning: interface names might be incorrect</span>
-<span id="cb28-3"><a href="#cb28-3"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [S], seq 116484521, win 64440, options [mss 1432,sackOK,TS val 3242019354 ecr 0,nop,wscale 7], length 0</span>
-<span id="cb28-4"><a href="#cb28-4"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [S.], seq 1680624244, ack 116484522, win 14120, options [mss 1412,nop,wscale 0,sackOK,TS val 1836076075 ecr 3242019354], length 0</span>
-<span id="cb28-5"><a href="#cb28-5"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 1, win 504, options [nop,nop,TS val 3242019365 ecr 1836076075], length 0</span>
-<span id="cb28-6"><a href="#cb28-6"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [P.], seq 1:87, ack 1, win 504, options [nop,nop,TS val 3242019365 ecr 1836076075], length 86: HTTP: GET / HTTP/1.1</span>
-<span id="cb28-7"><a href="#cb28-7"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [.], ack 87, win 14206, options [nop,nop,TS val 1836076086 ecr 3242019365], length 0</span>
-<span id="cb28-8"><a href="#cb28-8"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [P.], seq 1:776, ack 87, win 14206, options [nop,nop,TS val 1836076090 ecr 3242019365], length 775: HTTP: HTTP/1.1 200 OK</span>
-<span id="cb28-9"><a href="#cb28-9"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 776, win 510, options [nop,nop,TS val 3242019380 ecr 1836076090], length 0</span>
-<span id="cb28-10"><a href="#cb28-10"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [F.], seq 87, ack 776, win 510, options [nop,nop,TS val 3242019381 ecr 1836076090], length 0</span>
-<span id="cb28-11"><a href="#cb28-11"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [.], ack 88, win 14206, options [nop,nop,TS val 1836076101 ecr 3242019381], length 0</span>
-<span id="cb28-12"><a href="#cb28-12"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [F.], seq 776, ack 88, win 14206, options [nop,nop,TS val 1836076101 ecr 3242019381], length 0</span>
-<span id="cb28-13"><a href="#cb28-13"></a>eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [F.], seq 776, ack 88, win 14206, options [nop,nop,TS val 1836077101 ecr 3242019381], length 0</span>
-<span id="cb28-14"><a href="#cb28-14"></a>eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 777, win 510, options [nop,nop,TS val 3242020392 ecr 1836077101], length 0</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
+<pre class="{html}"><code>#| eval: false
+#| code-line-numbers: true
+
+reading from file curl.pcap, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144
+Warning: interface names might be incorrect
+eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [S], seq 116484521, win 64440, options [mss 1432,sackOK,TS val 3242019354 ecr 0,nop,wscale 7], length 0
+eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [S.], seq 1680624244, ack 116484522, win 14120, options [mss 1412,nop,wscale 0,sackOK,TS val 1836076075 ecr 3242019354], length 0
+eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 1, win 504, options [nop,nop,TS val 3242019365 ecr 1836076075], length 0
+eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [P.], seq 1:87, ack 1, win 504, options [nop,nop,TS val 3242019365 ecr 1836076075], length 86: HTTP: GET / HTTP/1.1
+eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [.], ack 87, win 14206, options [nop,nop,TS val 1836076086 ecr 3242019365], length 0
+eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [P.], seq 1:776, ack 87, win 14206, options [nop,nop,TS val 1836076090 ecr 3242019365], length 775: HTTP: HTTP/1.1 200 OK
+eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 776, win 510, options [nop,nop,TS val 3242019380 ecr 1836076090], length 0
+eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [F.], seq 87, ack 776, win 510, options [nop,nop,TS val 3242019381 ecr 1836076090], length 0
+eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [.], ack 88, win 14206, options [nop,nop,TS val 1836076101 ecr 3242019381], length 0
+eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [F.], seq 776, ack 88, win 14206, options [nop,nop,TS val 1836076101 ecr 3242019381], length 0
+eth3  In  IP 222.158.205.72.80 &gt; 192.168.1.242.45376: Flags [F.], seq 776, ack 88, win 14206, options [nop,nop,TS val 1836077101 ecr 3242019381], length 0
+eth3  Out IP 192.168.1.242.45376 &gt; 222.158.205.72.80: Flags [.], ack 777, win 510, options [nop,nop,TS val 3242020392 ecr 1836077101], length 0</code></pre>
 <p>3行目から5行目において、TCPの3ウェイハンドシェイクを確立させています。Flagsフィールドが[S]-&gt;[S.]-&gt;[.]となっています。tcpdumpでは、ACKが<code>.</code>で表されます。</p>
 </section>
 </section>

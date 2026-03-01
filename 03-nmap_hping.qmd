@@ -1,7 +1,6 @@
 ---
 date: 2026-01-20
 date-modified: last-modified
-engine: knitr
 ---
 
 # パケットの操作（nmap, hping）
@@ -566,7 +565,28 @@ nmap -sV -p 80 target-web -oA result
 hping3は、任意のフラグを付けたTCPパケットなどを手動で送信できるツールです。
 nmapより低レベルの実験ができます。
 
-まずはSYNパケットを送信します。
+nmapが「どのような情報を得たいか」を指定する道具だとすれば、
+hping3は「どのようなパケットを送るか」を自分で決める道具です。
+そのぶん、手間は増えますが、TCP/IPの挙動をより直接的に確かめられます。
+
+::: {.callout-note}
+もっと手軽な実務例として、社内LANでICMP Echo Requestがブロックされていて
+`ping`では疎通確認できない場合でも、インターネット上のWebサイトに対して
+`443/tcp`へSYNを送り、応答があるかどうかで死活確認する、という使い方があります。
+
+このように、hping3は「任意のプロトコルで疎通確認したい」ときにも役立ちます。
+:::
+
+以下のコマンドは、WSLのUbuntuそのものではなく、`scanner`コンテナ内で実行します。
+`tcpdump`と`hping3`とを同時に観察したいので、WSLでターミナルを2つ用意し、
+それぞれで次のコマンドを実行して`scanner`コンテナに入ってください。
+
+``` {.bash}
+docker exec -it ch3-scanner bash
+```
+
+まずは、80/tcpに対してSYNパケットを送信します。`target-web`の80/tcpは
+開いているので、SYNに対してSYN/ACKが返るはずです。
 
 ``` {.bash}
 hping3 -S -p 80 -c 3 target-web
@@ -574,32 +594,87 @@ hping3 -S -p 80 -c 3 target-web
 
 `-S`はSYNフラグ、`-p`は宛先ポート、`-c`は送信回数です。
 
+``` {.bash .resultblock}
+HPING target-web (eth0 10.250.250.20): S set, 40 headers + 0 data bytes
+len=44 ip=10.250.250.20 ttl=64 DF id=0 sport=80 flags=SA seq=0 win=64240 rtt=6.3 ms
+```
+
+上記の`flags=SA`は、SYN/ACKが返ってきたことを意味します。
+これは、相手がTCP接続の確立に応じようとしていることを表します。
+
+::: {.callout-note}
+hping3では、自分が作ったSYNに対して相手からSYN/ACKが返ったあと、
+ローカルのカーネルがRSTを返すことがあります。これは、そのSYNに対応する
+通常のソケットが存在しないためです。
+
+したがって、`tcpdump`で観察すると
+`SYN -> SYN/ACK -> RST`
+のように見えることがあります。
+:::
+
+たとえば、`tcpdump`では次のように観察できます。
+
+``` {.bash .resultblock}
+14:56:55.081980 IP 10.250.250.10.40000 > 10.250.250.20.80: Flags [S], seq 1926046387, win 512, length 0
+14:56:55.082035 IP 10.250.250.20.80 > 10.250.250.10.40000: Flags [S.], seq 3080780592, ack 1926046388, win 64240, options [mss 1460], length 0
+14:56:55.082043 IP 10.250.250.10.40000 > 10.250.250.20.80: Flags [R], seq 1926046388, win 0, length 0
+```
+
 ### hping3演習（SYN/ACK/フラグ操作）
-SYN以外のフラグでも挙動を確認します。
+次に、SYN以外のフラグでも挙動を確認します。
+
+まず、ACKだけを送ってみます。既存のTCP接続が無い状態でACKだけを受け取った相手は、
+通常はRSTを返します。
 
 ``` {.bash}
 hping3 -A -p 80 -c 3 target-web
 ```
 
+`tcpdump`では、たとえば次のように見えます。
+
+``` {.bash .resultblock}
+14:58:13.947661 IP 10.250.250.10.40001 > 10.250.250.20.80: Flags [.], ack 567889971, win 512, length 0
+14:58:13.947704 IP 10.250.250.20.80 > 10.250.250.10.40001: Flags [R], seq 567889971, win 0, length 0
+```
+
+次に、FINだけを送ってみます。これも今回の環境ではRSTが返るはずです。
+
 ``` {.bash}
 hping3 -F -p 80 -c 3 target-web
 ```
 
-::: problem
-`-S`と`-A`と`-F`とで、応答の傾向はどのように変わるでしょうか。
-tcpdumpと併用して観察し、理由を説明してください。
-:::
+送信したFINパケット自体は、`tcpdump`では次のように見えます。
 
-::: {.callout-tip title="観察の補助" collapse="true"}
-別ターミナルで次を実行し、フラグの違いを確認してください。
+``` {.bash .resultblock}
+14:59:17.328783 IP 10.250.250.10.40002 > 10.250.250.20.80: Flags [F], seq 1677856718, win 512, length 0
+```
+
+今回の演習で注目したい対応関係は、次の通りです。
+
+| 送るフラグ | 予想される応答 | 意味 |
+|---|---|---|
+| `SYN` | `SYN/ACK` | ポートが開いており、接続確立に応じようとしている |
+| `ACK` | `RST` | 既存接続が無いため、相手が異常なパケットとみなしている |
+| `FIN` | `RST` | 今回の環境では、接続状態が無いため終了要求として扱えない |
+
+1つ目のターミナルでは、`scanner`コンテナ内で次を実行し、
+パケットを観察してください。
+
 ``` {.bash}
 tcpdump -n -i eth0 'host target-web and tcp'
 ```
-:::
+
+2つ目のターミナルでも、`scanner`コンテナに入った上で、
+`hping3 -S ...`、`hping3 -A ...`、`hping3 -F ...`を順に実行します。
+
+`tcpdump`では、こちらが送ったフラグだけでなく、相手が返したフラグ
+（`S.`, `R`など）に注目してください。
 
 ## 追加課題
-この演習ラボでは、`target-web`が`80/tcp`以外にも、別のTCPポートで
-何らかのサービスを待ち受けています。ただし、そのポートはnmapの標準1000ポートには
+### 非標準ポートでの待ち受け
+`target-web`コンテナは、`80/tcp`以外の別のTCPポートで
+何らかのサービスを待ち受けています。
+ただし、そのポートはnmapでデフォルトで使用される1000ポートには
 含まれていません。
 
 ::: problem
@@ -607,7 +682,6 @@ tcpdump -n -i eth0 'host target-web and tcp'
 :::
 
 ::: {.callout-tip title="ヒント" collapse="true"}
-`nmap target-web`は、デフォルトでは標準的な1000個のポートだけを調べます。
 より広い範囲を調べるには、`-p`でポート範囲を明示してください。
 :::
 
@@ -645,30 +719,102 @@ curl -I http://target-web:18000/
 このポートで待ち受けているのがHTTPサーバーだと分かります。
 :::
 
+### 意図せざるファイルの露出
+Webサーバーの設定によっては、認証で保護されたディレクトリがある一方で、
+認証情報ファイルそのものが誤って公開されてしまうことがあります。
+
+Apacheでは`.htaccess`と`.htpasswd`の組み合わせで起きやすい事故として知られています。
+ここでは、その種の事故を模した状態を、直前に見つけた`18000/tcp`側に用意してあります。
+
 ::: problem
-`nmap -sS -p 80 target-web`を実行したときのパケットを、`tcpdump`で観察してください。
+`target-web`の18000/tcpに対してHTTP系のスクリプトスキャンを行い、
+認証で保護されたディレクトリと、誤って公開されている認証情報ファイルを見つけてください。
 :::
 
 ::: {.callout-tip title="ヒント" collapse="true"}
-1つのターミナルで`tcpdump`、もう1つで`nmap`を実行します。
-
-``` {.bash}
-tcpdump -n -i eth0 'host target-web and tcp port 80'
-```
-
-``` {.bash}
-nmap -sS -p 80 target-web
-```
+公開パスの列挙には、`http-enum`が使えます。
 :::
 
 ::: {.callout-tip title="解答" collapse="true"}
-`-sS`では、SYNパケットを送信し、その応答としてSYN/ACKまたはRSTを観察します。
-`target-web`の80/tcpは開いているので、SYNに対してSYN/ACKが返るはずです。
+たとえば、次のように実行できます。
 
-Ch.2で学んだTCPの3ウェイハンドシェイクと比較しながら、
-`nmap`が接続確立前の段階で状態を推定していることを確認してください。
+``` {.bash}
+nmap -sV -p 18000 --script http-enum target-web
+```
+
+結果には、次のような行が現れます。
+
+``` {.bash .resultblock}
+| http-enum:
+|   /.htpasswd: Incorrect permissions on .htaccess or .htpasswd files
+|_  /secret/: Potentially interesting folder (401 Unauthorized)
+```
+
+これにより、`/secret/`が認証で保護されている一方で、`/.htpasswd`が公開されていることが分かります。
+これは、認証情報ファイルが外部から取得できてしまうという、重大なセキュリティ上の不備です。
 :::
 
+::: problem
+`/secret/`では、どのHTTP認証方式が使われているか確認してください。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+`http-auth`を使い、調査対象のパスを指定します。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+たとえば、次のように確認できます。
+
+``` {.bash}
+nmap -sV -p 18000 --script http-auth --script-args http-auth.path=/secret/ target-web
+```
+
+結果は次のようになります。
+
+``` {.bash .resultblock}
+| http-auth:
+| HTTP/1.1 401 Unauthorized
+|_  Basic realm=Restricted
+```
+
+このため、`/secret/`はHTTP Basic認証で保護されていると分かります。
+:::
+
+::: problem
+`/.htpasswd`を取得し、パスワードを推測してください。
+その後、実際に`/secret/`へアクセスして確かめてください。
+:::
+
+::: {.callout-tip title="ヒント" collapse="true"}
+ファイルの取得には`curl`を使えます。
+最後は`curl -u`で認証付きアクセスを試します。
+:::
+
+::: {.callout-tip title="解答" collapse="true"}
+まず、`/.htpasswd`を取得します。
+
+``` {.bash}
+curl -s http://target-web:18000/.htpasswd
+```
+
+結果は次の通りです。
+
+``` {.bash .resultblock}
+student:$apr1$cwQzNMVI$qerkxPFGowaHaOyoTHuI1.
+```
+
+このハッシュをHashcatなどのパスワードクラッキングツールで解析すると、
+そのパスワードが`Password`だと判明します。そこで、次のように認証情報付きで
+アクセスします。
+
+``` {.bash}
+curl -i -u student:Password http://target-web:18000/secret/
+```
+
+成功すると、`HTTP/1.1 200 OK`が返ります。
+このケースは、認証情報ファイルの露出によって、
+保護されたディレクトリへアクセスできてしまうことが確認できる一例です。
+:::
 
 ## まとめ
 この章では、次の3点を学習しました。
@@ -676,6 +822,16 @@ Ch.2で学んだTCPの3ウェイハンドシェイクと比較しながら、
 - nmapで対象のホスト・ポート・サービスを効率的に調査する方法
 - NSE（`--script`）で追加情報を得る方法
 - hping3でTCPフラグを操作し、応答を観察する方法
+
+演習が終わったら、起動したコンテナを停止しておきます。
+
+``` {.bash}
+cd ~/cases/2509_unixtools104ex/ch3-lab
+```
+
+``` {.bash}
+docker compose down
+```
 
 ## 参考資料
 - Nmap「[Nmap Reference Guide](https://nmap.org/book/man.html)」

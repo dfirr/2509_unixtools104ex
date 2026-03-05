@@ -251,7 +251,7 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
     <div>
     <div class="quarto-title-meta-heading">更新日</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026年3月1日</p>
+      <p class="date-modified">2026年3月5日</p>
     </div>
   </div>
     
@@ -521,7 +521,10 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 <ul>
 <li><code>open</code>: 対象ポートで待ち受けしているプロセスがある</li>
 <li><code>closed</code>: 対象ホストには到達できるが、待ち受けはない</li>
-<li><code>filtered</code>: 応答が返ってこないため、openかclosedかを判定できない</li>
+<li><code>filtered</code>: 無応答、またはICMP Destination Unreachable（type 3）の一部コードにより、openかclosedかを判定できない
+<ul>
+<li>例: code 1（Host Unreachable）、code 2（Protocol Unreachable）、code 3（Port Unreachable: TCP系）、code 9/10/13（Administratively Prohibited）</li>
+</ul></li>
 </ul>
 </section>
 <section id="ackスキャン-sa" class="level3" data-number="3.3.5">
@@ -574,7 +577,7 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 <span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Nmap</span> done: 1 IP address <span class="er">(</span><span class="ex">1</span> host up<span class="kw">)</span> <span class="ex">scanned</span> in 6.47 seconds</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>SERVICE</code>列だけでなく、<code>VERSION</code>列にも注目してください。今回の例では、<code>http</code>サービスが<code>nginx 1.29.5</code>であることまで推定できています。</p>
 <p>なお、<code>-sV</code>を付けないときの<code>SERVICE</code>列は、ポート番号との対応表に基づくものであり、それは実際の応答を調べた結果ではありません。<code>-sV</code>を使うことで、実際の応答内容からサービスの種類やバージョンをより正確に推定できます。なお、対応表は<code>/usr/share/nmap/nmap-services</code>に入っています。</p>
-<p><code>-O</code>はOS推定です。コンテナ環境では精度に限界があるため、TCP/IPの応答の特徴からOSを推定します。</p>
+<p><code>-O</code>はOS推定です。TCP/IPの応答の特徴（TTL、ウィンドウサイズ、フラグ応答など）からOSを推定します。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-O</span> target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode bash resultblock code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Starting</span> Nmap 7.94SVN <span class="er">(</span> <span class="ex">https://nmap.org</span> <span class="kw">)</span> <span class="ex">at</span> 2026-03-01 14:08 UTC</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Nmap</span> scan report for target-web <span class="er">(</span><span class="ex">10.250.250.20</span><span class="kw">)</span></span>
@@ -592,7 +595,7 @@ div.callout-problem.callout-style-default .callout-icon::before, div.callout-pro
 <span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="ex">OS</span> detection performed. Please report any incorrect results at https://nmap.org/submit/ .</span>
 <span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Nmap</span> done: 1 IP address <span class="er">(</span><span class="ex">1</span> host up<span class="kw">)</span> <span class="ex">scanned</span> in 1.52 seconds</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
-<p>ただし、今回の<code>target-web</code>はコンテナで動いているため、ここで表示されるOS情報は「コンテナ自身のOS」というより、ホストカーネルの特徴を粗く推定した結果です。そのため、<code>-sV</code>に比べると、<code>-O</code>の結果は解釈に注意が必要です。</p>
+<p>OS推定はTCP/IPスタックの指紋を使うため、NATやファイアウォール、ポートフォワーディングなどで応答が変わると結果が乱れることがあります。可能なら対象と近いネットワークから測定するほうが精度が上がります。</p>
 <p><code>-Pn</code>を使うと、事前のホスト発見を省略してスキャンします。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmap</span> <span class="at">-Pn</span> <span class="at">-p</span> 80 target-web</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-style-default callout-note callout-titled">

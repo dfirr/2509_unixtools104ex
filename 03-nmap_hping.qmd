@@ -309,7 +309,8 @@ nmap -p 80,443 target-web target-closed
 
 - `open`: 対象ポートで待ち受けしているプロセスがある
 - `closed`: 対象ホストには到達できるが、待ち受けはない
-- `filtered`: 応答が返ってこないため、openかclosedかを判定できない
+- `filtered`: 無応答、またはICMP Destination Unreachable（type 3）の一部コードにより、openかclosedかを判定できない
+  - 例: code 1（Host Unreachable）、code 2（Protocol Unreachable）、code 3（Port Unreachable: TCP系）、code 9/10/13（Administratively Prohibited）
 
 ### ACKスキャン（-sA）
 `-sA`はACKパケットを使って、フィルタリングの有無を推定する手法です。
@@ -367,8 +368,7 @@ Nmap done: 1 IP address (1 host up) scanned in 6.47 seconds
 実際の応答内容からサービスの種類やバージョンをより正確に推定できます。
 なお、対応表は`/usr/share/nmap/nmap-services`に入っています。
 
-`-O`はOS推定です。コンテナ環境では精度に限界があるため、
-TCP/IPの応答の特徴からOSを推定します。
+`-O`はOS推定です。TCP/IPの応答の特徴（TTL、ウィンドウサイズ、フラグ応答など）からOSを推定します。
 
 ``` {.bash}
 nmap -O target-web
@@ -393,9 +393,9 @@ OS detection performed. Please report any incorrect results at https://nmap.org/
 Nmap done: 1 IP address (1 host up) scanned in 1.52 seconds
 ```
 
-ただし、今回の`target-web`はコンテナで動いているため、ここで表示されるOS情報は
-「コンテナ自身のOS」というより、ホストカーネルの特徴を粗く推定した結果です。
-そのため、`-sV`に比べると、`-O`の結果は解釈に注意が必要です。
+OS推定はTCP/IPスタックの指紋を使うため、NATやファイアウォール、ポートフォワーディングなどで
+応答が変わると結果が乱れることがあります。可能なら対象と近いネットワークから測定するほうが
+精度が上がります。
 
 `-Pn`を使うと、事前のホスト発見を省略してスキャンします。
 

@@ -248,5 +248,75 @@
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>パケットの操作（nmap, hping）</span>"
     ]
+  },
+  {
+    "objectID": "0a-quarto.html",
+    "href": "0a-quarto.html",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "",
+    "text": "4.1 目的\nこの章は番外編です。この資料もスライドも、すべてQuartoで作られています。\nQuartoはPandocベースのオープンソース科学・技術出版システムで、原稿をMarkdown（.qmd）記法で記載し、それをコンパイルすることで文書ファイルを作成します。\n1つの文書の中で文書とコードと実行結果とが同居できる点が最大の魅力ですが、スライド作成がPowerPointなしで済ませられる点も強力です。Gitによる版管理、厳密な位置合わせ、自動化が達成できるからです。また、Agentic AIとの相性もよく、草稿や目次案の生成もできます。\nこの章では、WSLが入ったWindows 11環境を念頭において、Visual Studio CodeでQuartoによるスライド作成を実現するための方法を紹介します。",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
+  },
+  {
+    "objectID": "0a-quarto.html#目的",
+    "href": "0a-quarto.html#目的",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "",
+    "text": "ノート\n\n\n\n私自身は自作のDocker Composeファイルを使い、RStudio Serverで執筆しています。データ分析がメインであれば、非常に有用です。",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
+  },
+  {
+    "objectID": "0a-quarto.html#必要な準備",
+    "href": "0a-quarto.html#必要な準備",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "4.2 必要な準備",
+    "text": "4.2 必要な準備\n以下の2点を前提とします。\n\nWSL（Windows Subsystem for Linux）が使えるようになっていること。\nVisual Studio Codeが使え、codeコマンドで起動できること。\n\n以下は、WSL上で実行します。\n\n4.2.1 Quartoのインストール\n日本語フォントをインストールします。GoogleとAdobeとで共同開発されたNotoがあれば、最低限にはなります。\nsudo apt update;\nsudo apt install -y fonts-noto-cjk\nQuartoは.debファイルで提供されています。執筆時点では1.10.18-linux-amd64.debが最新版ですが、必要に応じて新しいものをダウンロード、インストールしてください。\ncd /tmp\ncurl -LO https://github.com/quarto-dev/quarto-cli/releases/download/v1.10.18/quarto-1.10.18-linux-amd64.deb\nsudo apt install -y ./quarto-1.10.18-linux-amd64.deb\nインストールの状況を確認するために、quarto checkコマンドを実行します。\nquarto check\n$ quarto check\nQuarto 1.10.18\n[✓] Checking environment information...\n      Quarto cache location: /home/swat/.cache/quarto\n[✓] Checking versions of quarto binary dependencies...\n      Pandoc version 3.10.0: OK\n      Dart Sass version 1.101.0: OK\n      Deno version 2.7.14: OK\n      Typst version 0.15.1: OK\n[✓] Checking versions of quarto dependencies......OK\n[✓] Checking Quarto installation......OK\n      Version: 1.10.18\n      Path: /opt/quarto/bin\n\n[✓] Checking tools....................OK\n      TinyTeX: (not installed)\n      Chrome Headless Shell: (not installed)\n      VeraPDF: (not installed)\n\n[✓] Checking LaTeX....................OK\n      Tex:  (not detected)\n\n[✓] Checking Chrome Headless....................OK\n      Chrome:  (not detected)\n\n[✓] Checking basic markdown render....OK\n\n[✓] Checking R installation...........(None)\n\n      Unable to locate an installed version of R.\n      Install R from https://cloud.r-project.org/\n\n[✓] Checking Python 3 installation....OK\n      Version: 3.12.3\n      Path: /usr/bin/python3\n      Jupyter: (None)\n\n      Jupyter is not available in this Python installation.\n      Install with python3 -m pip install jupyter\n\n[✓] Checking Julia installation...\n上のように、Quartoから利用可能な環境の存在がチェックされます。\n\n\n\n\n\n\nノート\n\n\n\nインタラクティブなプログラミング環境が必要であれば、Jupyterを入れてください。少なくとも以下の3つがあれば、quarto checkは成功します。\nsudo apt install -y python3-ipykernel python3-nbformat python3-nbclient\n\n\n\n\n4.2.2 VS Code機能拡張のインストール\n最低限必要な機能拡張は、次の2つです。CLIでインストールするには、PowerShellで次のようにします。（本当はWSLでもかまいません。）\ncode --install-extension ms-vscode-remote.remote-wsl\ncode --install-extension quarto.quarto\n次のようにして、インストール状況を確認できます。\ncode --list-extensions | Select-String 'remote-wsl|quarto'\n&gt; code --list-extensions | Select-String 'remote-wsl|quarto'\nms-vscode-remote.remote-wsl\nquarto.quarto",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
+  },
+  {
+    "objectID": "0a-quarto.html#最初のスライド",
+    "href": "0a-quarto.html#最初のスライド",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "4.3 最初のスライド",
+    "text": "4.3 最初のスライド\n\n4.3.1 スライド作成\nでは、Quartoでスライドを作ってみましょう。WSLにて、作業用ディレクトリを作り、そこに移動します。\nmkdir -p ~/quarto-first\ncd ~/quarto-first\nそして、そのディレクトリでVSCodeを実行します。\ncode .\nすると、Windows側にてVSCodeのウインドウが表示されます。\nウインドウの左側で、2点確認すべき点があります。\n第1に、左下の青い部分が「WSL: Ubuntu」となっている必要があります。さもなくば、WSL Remote機能拡張が正しく認識されていません。\n第2に、左下の水色の部分が「Restricted Mode」になっていて、そのディレクトリが信頼されていない状態にあるのを、修正する必要があります。それには、「Restricted Mode」のアイコンをクリックし、「Trust」ボタンを押してください。水色の部分が消えれば成功です。\n\n\n\n\n\n最初に作るスライドは、slide.qmdという名前にします。WSLのターミナルで、以下のコマンドを実行します。\ncode slide.qmd\nすると、VSCodeのウインドウ内に、slide.qmdのタブが表示されます。そこに、以下のテキストを貼り付けます。\n---\ntitle: Quarto + Reveal.js入門\nauthor: テスト太郎\nformat:\n  revealjs:\n    theme: simple\n    slide-number: true\n    embed-resources: true\n    transition: fade\n---\n\n## Quartoとは\n\nMarkdownから、HTML、PDF、Word、Webサイト、スライドを生成できるツールです。\n\n## なぜプレゼンに使うのか\n\n- テキストで管理できる\n- Gitで差分が見える\n- 再利用しやすい\n- 図表やコードを埋め込みやすい\n\n## Quartoのしくみ\n\nこれは「Markdownを入力にして、HTMLを出力するビルドツール」です。\n\n```{.bash}\nquarto render slides.qmd\n```\n\n## おしまい\n\nありがとうございました。\n\n\n4.3.2 プレビューと結果取得",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
+  },
+  {
+    "objectID": "0a-quarto.html#テーマを変える",
+    "href": "0a-quarto.html#テーマを変える",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "4.4 テーマを変える",
+    "text": "4.4 テーマを変える",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
+  },
+  {
+    "objectID": "0a-quarto.html#おわりに",
+    "href": "0a-quarto.html#おわりに",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "4.5 おわりに",
+    "text": "4.5 おわりに",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
+  },
+  {
+    "objectID": "0a-quarto.html#参考文献",
+    "href": "0a-quarto.html#参考文献",
+    "title": "4  Quartoスライド作成環境を作る",
+    "section": "4.6 参考文献",
+    "text": "4.6 参考文献",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Quarto + Reveal.js入門</span>"
+    ]
   }
 ]

@@ -10,6 +10,30 @@ pre.sourceCode.resultblock.code-with-copy code {
   display: block !important;
 }
 
+.psblock {
+  background-color: #f0f8ff !important; /* soft blue */
+}
+
+.cmdblock {
+  background-color: #f5f5f5 !important; /* soft gray (white smoke) */
+}
+
+.bashblock {
+  background-color: #fffaf0 !important; /* pale orange (floral white) */
+}
+
+pre.sourceCode.psblock.code-with-copy,
+pre.sourceCode.cmdblock.code-with-copy,
+pre.sourceCode.bashblock.code-with-copy,
+pre.sourceCode.psblock.code-with-copy code,
+pre.sourceCode.cmdblock.code-with-copy code,
+pre.sourceCode.bashblock.code-with-copy code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-x: hidden !important;
+  display: block !important;
+}
+
 .callout.callout-problem .callout-icon::before {
   color: lightpink !important;
   -webkit-text-fill-color: var(--callout-color) !important; /* 念のため */

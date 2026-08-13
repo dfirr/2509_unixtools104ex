@@ -10,6 +10,7 @@ book:
     - 01-curl_jq.qmd
     - 02-tcpdump_nc.qmd
     - 03-nmap_hping.qmd
+    - 0a-quarto.qmd
 
 # bibliography: references.bib
 
